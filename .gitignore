@@ -1,2 +1,2 @@
 hidapi.dll
-./*.o
+*.o
