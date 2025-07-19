@@ -1,0 +1,6 @@
+[submodule "mcp2210-hidapi"]
+	path = mcp2210-hidapi
+	url = https://github.com/joemdiente/mcp2210-hidapi
+[submodule "mesa"]
+	path = mesa
+	url = https://github.com/joemdiente/mesa
