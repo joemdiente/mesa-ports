@@ -33,13 +33,13 @@ phy_demo_appl for Malibu PHY on Windows.
 ### Build Instructions
 1. Initialize submodule
     ```
-    # git submodule init
-    # git submodule update
+    git submodule init
+    git submodule update
     ```
 2. Open bash and run build script.
     ```
-    # bash
-    # ./build_malibu_mcp2210_hidapi_win32.sh
+    bash
+    ./build_malibu_mcp2210_hidapi_win32.sh
     ```
 
 ### Run Instructions 
