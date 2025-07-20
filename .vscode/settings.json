@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "unistd.h": "c",
-        "vtss_api.h": "c"
+        "vtss_api.h": "c",
+        "cstdlib": "c"
     }
 }

@@ -145,7 +145,7 @@ int mcp2210_hidapi_init(void) {
 	if (!hidapi_handle) {
 		printf("Unable to open device VID:0x4d8 PID:0xDE\n");
 		hid_exit();
- 		return 1;
+ 		exit(EXIT_FAILURE);
 	}
 	printf("Opened MCP2210\r\n");
 
@@ -182,7 +182,7 @@ int malibu_mcp2210_board_init(int argc, const char **argv, vtss_appl_board_t *bo
         So only 1 MCP2210 should be connected.\r\n \
         ");
         
-      exit(EXIT_SUCCESS);
+      exit(EXIT_FAILURE);
     } 
   }
   
