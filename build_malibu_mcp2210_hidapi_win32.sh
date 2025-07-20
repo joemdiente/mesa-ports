@@ -22,7 +22,7 @@ MESA_INC_DIR=${MESA_DIR}/include/
 MESA_PHY_INC=${MESA_DIR}/base/phy/phy_10g/
 
 # PHY_DEMO_APPL
-APPL_MALIBU_MCP2210_WIN32_SRC="./malibu_hidapi_mcp2210_win32.c ${MESA_DIR}/phy_demo_appl/appl/vtss_appl_10g_phy_malibu.c"
+APPL_MALIBU_MCP2210_WIN32_SRC="./malibu_mcp2210_hidapi_win32.c ${MESA_DIR}/phy_demo_appl/appl/vtss_appl_10g_phy_malibu.c"
 
 # BASE AIL
 MESA_BASE_AIL_PHY_SRC="${MESA_DIR}/base/ail/vtss_wis_api.c \
@@ -76,7 +76,7 @@ echo "[2] Copy hidapi.dll alongside malibu_mcp2210.exe"
 cp ${MCP2210_HIDAPI_DIR}/x64/hidapi.dll ./
 
 echo ""
-echo "[3] Building Malibu MCP2210-HIDAPI WIN32 PHY_DEMO_APPL" 
+echo "[3] Building Malibu MCP2210-HIDAPI-WIN32 PHY_DEMO_APPL" 
 gcc --static \
   -I ${MESA_INC_DIR} \
   -I ${MESA_PHY_INC} \
