@@ -1,6 +1,11 @@
 #!/bin/sh
 # SPDX-License-Identifier: MIT
-
+# /* 
+#  * Malibu MCP2210-HIDAPI Build Script
+#  *
+#  * Author: Joemel John Diente <joemdiente@gmail.com>
+#  * 
+#  */
 ##    -DRPI_MIIM \
 ##    -DVTSS_ARCH_VENICE_C=TRUE \     // Compile in support for Venice C and later
 ##    -DVTSS_CHIP_CU_PHY \            // Compile in support for 1G PHY Families in API

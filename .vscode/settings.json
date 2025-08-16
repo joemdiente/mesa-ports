@@ -3,5 +3,6 @@
         "unistd.h": "c",
         "vtss_api.h": "c",
         "cstdlib": "c"
-    }
+    },
+    "cmake.sourceDirectory": "D:/Desktop/mesa-ports/mcp2210-hidapi"
 }

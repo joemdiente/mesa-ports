@@ -1,8 +1,12 @@
 //***************************************************************************
+//* Malibu MCP2210-HIDAPI Win32 Connector
+//*
 //* This file contains board specific functions needed for running the PHY  *
 //* API on a VSC8258EV with MCP2210. HID API is used to do hidraw read and write.*
 //* HID API is supposedly able to run with Linux and WIN32.*
 //* Currently, this demo is for WIN32 for now.
+//* 
+//* Author: Joemel John Diente <joemdiente@gmail.com>
 //***************************************************************************
 
 #include <stdarg.h> // For va_list
@@ -77,7 +81,7 @@ vtss_rc spi_32bit_read_write_mcp2210_hidapi(vtss_inst_t    inst,
     bit_seq_1[0] |= (dev << MALIBU_DEVNO_BIT_SEQ_OFFSET);
     bit_seq_1[1] = (reg_num & 0xFF00) >> 8;
     bit_seq_1[2] = (reg_num & 0x00FF);
-    //Don't Care "data" field
+    //bit_seq_1[3] Don't Care "data" field
 
     // Second Bit Sequence to Send
     // Note: Use DEV_ID address to prevent clearing "clear-on-read" registers (Page 158)
@@ -86,7 +90,7 @@ vtss_rc spi_32bit_read_write_mcp2210_hidapi(vtss_inst_t    inst,
     bit_seq_2[0] |= (0x1E << MALIBU_DEVNO_BIT_SEQ_OFFSET);
     bit_seq_2[1] = 0x00; // DEV_ID
     bit_seq_2[2] = 0x00; // DEV_ID
-    //Don't Care "data" field
+    //bit_seq_1[3] Don't Care "data" field
   }
   // Write
   else {
