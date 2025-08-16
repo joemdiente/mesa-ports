@@ -1,0 +1,492 @@
+/d/Desktop/mesa-ports
+$ ./malibu_mcp2210
+//Default AIL TRACE Level : VTSS_TRACE_LEVEL_ERROR
+//Default CIL TRACE Level : VTSS_TRACE_LEVEL_ERROR
+//Default Setup Assumptions:
+//Board has Power Applied prior to Demo start
+//Pwr Supply/Voltages Stable, Ref Clk Stable, Ref & PLL Stable
+
+In malibu_mcp2210_board_init
+Opened MCP2210
+DEV_ID: 0x00008258
+Out malibu_char_board_init
+//Comment: Board being initialized
+0x1Ex0000 = 0x8258
+1x1Ex0000 = 0x8258
+2x1Ex0000 = 0x8258
+
+0x1xF112 = 0x7DF820
+0x1xF112 = 0x3DF828
+
+1x1xF112 = 0x7DF820
+1x1xF112 = 0x4DF828
+
+2x1xF112 = 0x7DF820
+2x1xF112 = 0x5DF828
+2x1xF112 = 0x7DF820
+
+3x1xF112 = 0x7DF820
+3x1xF112 = 0x6DF828
+3x1xF112 = 0x7DF820
+
+0x1xF120 = 0x4000C00
+1x1xF120 = 0x4000C00
+2x1xF120 = 0x4000C00
+3x1xF120 = 0x4000C00
+
+0x1xF121 = 0x88888924
+0x1xF121 = 0x48888924
+0x1xF121 = 0x88888924
+
+
+Setup of VSC825x - MALIBU Char Board
+VTSS_PORT_NO_START = 0
+VTSS_PORTS = 4
+
+Board Info -->
+Board name: Malibu_MCP2210
+port_no = 0
+Board Target: 0x1
+Board Inst: 00000290A83BC2A0
+
+Configuring Operating MODE for ALL Ports; 0=MODE_10GLAN;  1=MODE_1GLAN;  2=MODE_10GWAN, Enter Oper_MODE (0/1/2): 1
+
+Operating MODE for ALL Ports: 1=MODE_1GLAN
+
+Configuring port 0
+vtss_phy_10g_mode_set: port 0, oper_mode = 2
+Lvl:Error file:./mesa/base/phy/phy_10g/vtss_malibu_b_host_pma_sd10g65_setup.c func:malibu_b_host_pma_sd10g_rx_register_cfg line:1696 - The expected value for SD10G65_rx_rcpll_stat0 pllf_lock_stat was 0x1 but is 0x0
+
+
+Configuring 1G Auto Negotiation, port 0:
+
+Configuring port 1
+vtss_phy_10g_mode_set: port 1, oper_mode = 2
+
+Configuring 1G Auto Negotiation, port 1:
+
+Configuring port 2
+vtss_phy_10g_mode_set: port 2, oper_mode = 2
+
+Configuring 1G Auto Negotiation, port 2:
+
+Configuring port 3
+vtss_phy_10g_mode_set: port 3, oper_mode = 2
+
+Configuring 1G Auto Negotiation, port 3:
+
+==========================================================
+Debug Reg Dump for Port 0
+VTSS_MALIBU_10G_DUMP
+LINE REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x03   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x03   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x03   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x03   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x03   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x03   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x01   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x01   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x01   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x01   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x01   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x01   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x01   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x01   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x01   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x01   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x01   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x01   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x01   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x01   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x01   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x01   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x01   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x01   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x01   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x01   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x01   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x01   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x01   0xf112     0x00820820
+HOST REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x0b   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x0b   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x0b   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x0b   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x0b   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x0b   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x09   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x09   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x09   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x09   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x09   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x09   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x09   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x09   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x09   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x09   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x09   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x09   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x09   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x09   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x09   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x09   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x09   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x09   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x09   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x09   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x09   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x09   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x09   0xf112     0x00820820
+
+Temp_Mon_Regs                                :  0x1e   0x01c1     0x00000000
+Datapath_Control                             :  0x04   0xea70     0x00000000
+MON_GOOD_LSW                                 :  0x04   0xe960     0x00000000
+MON_GOOD_MSW                                 :  0x04   0xe961     0x00000000
+MON_BAD_LSW                                  :  0x04   0xe970     0x00000000
+MON_BAD_MSW                                  :  0x04   0xe971     0x00000000
+MON_FRAG_LSW                                 :  0x04   0xe980     0x00000000
+MON_FRAG_MSW                                 :  0x04   0xe981     0x00000000
+MON_LFAULT_LSW                               :  0x04   0xe990     0x00000000
+MON_LFAULT_MSW                               :  0x04   0xe991     0x00000000
+MON_BER_LSW                                  :  0x04   0xe9a0     0x00000000
+MON_BER_MSW                                  :  0x04   0xe9a1     0x00000000
+==========================================================
+
+Malibu GPIO Output: Driving HIGH configuration for port 0, gpio 0
+
+Malibu GPIO Output: Driving LOW configuration for port 0, gpio 4
+
+Malibu GPIO Output: Activity LED configuration for port 0, gpio 25
+
+==========================================================
+Debug Reg Dump for Port 1
+VTSS_MALIBU_10G_DUMP
+LINE REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x03   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x03   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x03   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x03   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x03   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x03   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x01   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x01   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x01   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x01   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x01   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x01   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x01   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x01   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x01   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x01   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x01   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x01   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x01   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x01   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x01   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x01   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x01   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x01   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x01   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x01   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x01   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x01   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x01   0xf112     0x00820820
+HOST REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x0b   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x0b   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x0b   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x0b   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x0b   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x0b   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x09   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x09   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x09   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x09   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x09   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x09   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x09   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x09   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x09   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x09   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x09   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x09   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x09   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x09   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x09   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x09   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x09   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x09   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x09   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x09   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x09   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x09   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x09   0xf112     0x00820820
+
+Temp_Mon_Regs                                :  0x1e   0x01c1     0x00000000
+Datapath_Control                             :  0x04   0xea70     0x00000000
+MON_GOOD_LSW                                 :  0x04   0xe960     0x00000000
+MON_GOOD_MSW                                 :  0x04   0xe961     0x00000000
+MON_BAD_LSW                                  :  0x04   0xe970     0x00000000
+MON_BAD_MSW                                  :  0x04   0xe971     0x00000000
+MON_FRAG_LSW                                 :  0x04   0xe980     0x00000000
+MON_FRAG_MSW                                 :  0x04   0xe981     0x00000000
+MON_LFAULT_LSW                               :  0x04   0xe990     0x00000000
+MON_LFAULT_MSW                               :  0x04   0xe991     0x00000000
+MON_BER_LSW                                  :  0x04   0xe9a0     0x00000000
+MON_BER_MSW                                  :  0x04   0xe9a1     0x00000000
+==========================================================
+
+Malibu GPIO Output: Driving HIGH configuration for port 1, gpio 8
+
+Malibu GPIO Output: Driving LOW configuration for port 1, gpio 12
+
+Malibu GPIO Output: Activity LED configuration for port 1, gpio 26
+
+==========================================================
+Debug Reg Dump for Port 2
+VTSS_MALIBU_10G_DUMP
+LINE REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x03   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x03   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x03   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x03   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x03   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x03   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x01   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x01   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x01   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x01   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x01   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x01   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x01   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x01   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x01   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x01   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x01   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x01   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x01   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x01   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x01   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x01   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x01   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x01   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x01   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x01   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x01   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x01   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x01   0xf112     0x00820820
+HOST REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x0b   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x0b   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x0b   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x0b   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x0b   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x0b   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x09   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x09   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x09   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x09   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x09   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x09   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x09   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x09   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x09   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x09   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x09   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x09   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x09   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x09   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x09   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x09   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x09   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x09   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x09   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x09   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x09   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x09   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x09   0xf112     0x00820820
+
+Temp_Mon_Regs                                :  0x1e   0x01c1     0x00000000
+Datapath_Control                             :  0x04   0xea70     0x00000000
+MON_GOOD_LSW                                 :  0x04   0xe960     0x00000000
+MON_GOOD_MSW                                 :  0x04   0xe961     0x00000000
+MON_BAD_LSW                                  :  0x04   0xe970     0x00000000
+MON_BAD_MSW                                  :  0x04   0xe971     0x00000000
+MON_FRAG_LSW                                 :  0x04   0xe980     0x00000000
+MON_FRAG_MSW                                 :  0x04   0xe981     0x00000000
+MON_LFAULT_LSW                               :  0x04   0xe990     0x00000000
+MON_LFAULT_MSW                               :  0x04   0xe991     0x00000000
+MON_BER_LSW                                  :  0x04   0xe9a0     0x00000000
+MON_BER_MSW                                  :  0x04   0xe9a1     0x00000000
+==========================================================
+
+Malibu GPIO Output: Driving HIGH configuration for port 2, gpio 16
+
+Malibu GPIO Output: Driving LOW configuration for port 2, gpio 20
+
+Malibu GPIO Output: Activity LED configuration for port 2, gpio 27
+
+==========================================================
+Debug Reg Dump for Port 3
+VTSS_MALIBU_10G_DUMP
+LINE REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x03   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x03   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x03   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x03   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x03   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x03   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x03   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x03   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x01   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x01   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x01   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x01   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x01   0xf01b     0x00874680
+APC_EQZ_AGC_PAR_CFG                          :  0x01   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x01   0xf012     0x01fc4680
+APC_EQZ_OFFS_PAR_CFG                         :  0x01   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x01   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x01   0xf00c     0x00ca1358
+APC_EQZ_GAIN_CTRL_CFG                        :  0x01   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x01   0xf01e     0x00364680
+APC_DFE1_PAR_CFG                             :  0x01   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x01   0xf021     0x00194680
+APC_DFE2_PAR_CFG                             :  0x01   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x01   0xf024     0x00094680
+APC_DFE3_PAR_CFG                             :  0x01   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x01   0xf027     0x000b4680
+APC_DFE4_PAR_CFG                             :  0x01   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x01   0xf001     0x5548026a
+SD10G65_OB_CFG0                              :  0x01   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x01   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x01   0xf112     0x00820820
+HOST REGISTERS
+REG_NAME                                        DEV_ID REG_ADDR   VALUE
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+PCS_STATUS_2                                 :  0x0b   0x0008     0x00008005
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+10GBASE_R_PCS_Status_2                       :  0x0b   0x0021     0x00000000
+PCS_Tx_Sequencing_Error_Count                :  0x0b   0x8010     0x00000000
+PCS_Rx_Sequencing_Error_Count                :  0x0b   0x8011     0x00000000
+PCS_Tx_Block_Encode_Error_Count              :  0x0b   0x8012     0x00000000
+PCS_Rx_Block_Encode_Error_Count              :  0x0b   0x8013     0x00000000
+PCS_Tx_Char_Encode_Error_Count               :  0x0b   0x8014     0x00000000
+PCS_Rx_Char_Encode_Error_Count               :  0x0b   0x8015     0x00000000
+APC_EQZ_L_CTRL                               :  0x09   0xf018     0x00000680
+APC_EQZ_L_PAR_CFG                            :  0x09   0xf01a     0x01000000
+APC_EQZ_C_CTRL                               :  0x09   0xf015     0x00000680
+APC_EQZ_C_PAR_CFG                            :  0x09   0xf017     0x01000000
+APC_EQZ_AGC_CTRL                             :  0x09   0xf01b     0x00584680
+APC_EQZ_AGC_PAR_CFG                          :  0x09   0xf01d     0x50f80058
+APC_EQZ_OFFS_CTRL                            :  0x09   0xf012     0x02004680
+APC_EQZ_OFFS_PAR_CFG                         :  0x09   0xf014     0x50a06080
+APC_EQZ_LD_CTRL                              :  0x09   0xf00d     0x2c808018
+APC_EQZ_CTRL_STATUS                          :  0x09   0xf00c     0x00404018
+APC_EQZ_GAIN_CTRL_CFG                        :  0x09   0xf00a     0x37f00000
+APC_DFE1_CTRL                                :  0x09   0xf01e     0x00404680
+APC_DFE1_PAR_CFG                             :  0x09   0xf020     0x50440040
+APC_DFE2_CTRL                                :  0x09   0xf021     0x00204680
+APC_DFE2_PAR_CFG                             :  0x09   0xf023     0x50240020
+APC_DFE3_CTRL                                :  0x09   0xf024     0x00104680
+APC_DFE3_PAR_CFG                             :  0x09   0xf026     0x50140010
+APC_DFE4_CTRL                                :  0x09   0xf027     0x00104680
+APC_DFE4_PAR_CFG                             :  0x09   0xf029     0x50140010
+APC_COMMON_CFG0                              :  0x09   0xf001     0x554d026a
+SD10G65_OB_CFG0                              :  0x09   0xf110     0x00002127
+SD10G65_OB_CFG1                              :  0x09   0xf111     0x042f0820
+SD10G65_OB_CFG2                              :  0x09   0xf112     0x00820820
+
+Temp_Mon_Regs                                :  0x1e   0x01c1     0x00000000
+Datapath_Control                             :  0x04   0xea70     0x00000000
+MON_GOOD_LSW                                 :  0x04   0xe960     0x00000000
+MON_GOOD_MSW                                 :  0x04   0xe961     0x00000000
+MON_BAD_LSW                                  :  0x04   0xe970     0x00000000
+MON_BAD_MSW                                  :  0x04   0xe971     0x00000000
+MON_FRAG_LSW                                 :  0x04   0xe980     0x00000000
+MON_FRAG_MSW                                 :  0x04   0xe981     0x00000000
+MON_LFAULT_LSW                               :  0x04   0xe990     0x00000000
+MON_LFAULT_MSW                               :  0x04   0xe991     0x00000000
+MON_BER_LSW                                  :  0x04   0xe9a0     0x00000000
+MON_BER_MSW                                  :  0x04   0xe9a1     0x00000000
+==========================================================
+
+Malibu GPIO Output: Driving HIGH configuration for port 3, gpio 24
+
+Malibu GPIO Output: Driving LOW configuration for port 3, gpio 28
+
+Malibu GPIO Output: Activity LED configuration for port 3, gpio 28
+ *************************************
+ The following commands are supported:
+ debug  <port_no>  - Sets PHY API to output Debug
+ dump <port_no> - Dump Reg 0-31 Pages:std/ext1/ext2/ext3/gpio/1588/macsec/1588_reg/macsec_rng/ext_rng for Port
+ rdext <port_no> <page> <addr> - Read Extended Page - where page=1,2,3,4,0x10,0x1588,0x2A30,0x52B5 - <addr> 0-31
+ wrext <port_no> <page> <addr> <value> - Write Ext Page - page=1,2,3,4,0x10,0x1588,0x2A30,0x52B5 - <addr> 0-31 - Value MUST be in hex
+ ----------------------------------------  |  -------------------------------------------------------
+ spird    <port_no> <dev> <addr>           |  spiwr       <port_no> <dev> <addr> <value> - Value MUST be in hex
+ getmedia <port_no> - Get Media i/f        |  setmedia    <port_no> - Set Media I/F for port
+ getmac   <port_no> - Get MAC i/f          |  setmac      <port_no> - Set MAC I/F for port
+ ----------------------------------------  |  -------------------------------------------------------
+ 10g_kr   <port_no> - 10G Base KR          |  synce       <port_no> - Sync-E Config
+ prbs     <port_no> - PRBS                 |  obuf        <port_no> - Output Buf Control
+ status   <port_no> - Rtn PHY Link status  |  vscope      <port_no> - Config for VSCOPE FAST/FULL SCAN
+ lpback   <port_no> - Set PHY Loopback     |
+ int10g   <port_no> - Set 10g Interuppts   |  poll10g     <port_no>
+ ex_int   <port_no> - Set Ext Interuppts   |  ex_poll     <port_no>
+ ts_int   <port_no> - Set TS Interuppts    |  ts_poll     <port_no>
+ macsec   <port_no> - MACSEC Block config  |  1588        <port_no> - 1588 Block Config
+ dbgdump  <port_no> - Reg Dump             |
+
+ exit - Exit Program
+
+>
