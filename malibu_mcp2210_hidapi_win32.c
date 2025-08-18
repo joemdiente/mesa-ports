@@ -205,7 +205,7 @@ int malibu_mcp2210_board_init(int argc, const char **argv, vtss_appl_board_t *bo
   u32 *val = (u32*)malloc(sizeof(u32));
 #ifdef TEST_CODE
   *val = 0x55AA55AA;
-  // Write to Temperature Monitor (15:0bits are writable; others 0x00)
+  // Write to Temperature Monitor (15:0 bits are writable; others 0x00)
   spi_32bit_read_write_mcp2210_hidapi(NULL, 0x0, 0, 0x1e, 0x01C0, val);
   // Read
   spi_32bit_read_write_mcp2210_hidapi(NULL, 0x0, 1, 0x1e, 0x01C0, val);
@@ -222,6 +222,6 @@ int malibu_mcp2210_board_init(int argc, const char **argv, vtss_appl_board_t *bo
 // Function for initializing the hardware board.
 int malibu_board_init(int argc, const char **argv, vtss_appl_board_t *board)
 {
-  malibu_mcp2210_board_init(argc, argv, board); // Use init function for Rabbit MIIM.
+  malibu_mcp2210_board_init(argc, argv, board);
   return 0;
 }
