@@ -71,9 +71,9 @@ MCP2210_HIDAPI_SRC="${MCP2210_HIDAPI_DIR}/src/*.c"
 MCP2210_HIDAPI_ARGS="./*.o -L${MCP2210_HIDAPI_DIR}/x64/ -lhidapi" 
 
 echo "[1] Building MCP2210-HIDAPI Objects"
-gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} &
-gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-gpio.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} &
-gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-spi.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} &
+gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} 
+gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-gpio.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} 
+gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-spi.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC}
 gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-misc.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC}
 
 echo ""
@@ -98,9 +98,13 @@ gcc --static \
 
 if [ $? -ne 0 ]; then
   echo "malibu-mcp2210.exe compilation failed."
-  exit 1 # Exit the script with an error code
 else
   echo "malibu-mcp2210.exe compilation successful."
 fi
 
+echo "Press CTRL+C to Stop"
+while TRUE
+do 
+  sleep 1
+done
 
