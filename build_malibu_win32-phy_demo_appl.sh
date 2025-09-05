@@ -77,11 +77,11 @@ gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-spi.c -I${MCP2210_HIDAPI_INC} -I
 gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-misc.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC}
 
 echo ""
-echo "[2] Copy hidapi.dll alongside malibu_mcp2210.exe"
+echo "[2] Copy hidapi.dll alongside malibu_win32-phy_demo_appl.exe"
 cp ${MCP2210_HIDAPI_DIR}/x64/hidapi.dll ./
 
 echo ""
-echo "[3] Building Malibu MCP2210-HIDAPI-WIN32 PHY_DEMO_APPL" 
+echo "[3] Building Malibu malibu_win32-phy_demo_appl" 
 gcc --static \
   -I ${MESA_INC_DIR} \
   -I ${MESA_PHY_INC} \
@@ -94,12 +94,12 @@ gcc --static \
   ${PHY_10G_SRC} \
   ${APPL_MALIBU_MCP2210_WIN32_DEFINE} \
   ${MCP2210_HIDAPI_ARGS} \
-  -o malibu_mcp2210
+  -o malibu_win32-phy_demo_appl
 
 if [ $? -ne 0 ]; then
-  echo "malibu-mcp2210.exe compilation failed."
+  echo "malibu_win32-phy_demo_appl.exe compilation failed."
 else
-  echo "malibu-mcp2210.exe compilation successful."
+  echo "malibu_win32-phy_demo_appl.exe compilation successful."
 fi
 
 echo "Press CTRL+C to Stop"

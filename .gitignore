@@ -1,3 +1,4 @@
 hidapi.dll
 *.o
-malibu_mcp2210.exe
+*.exe
+

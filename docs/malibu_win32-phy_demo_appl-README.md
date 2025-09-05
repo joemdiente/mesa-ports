@@ -39,8 +39,8 @@ phy_demo_appl for Malibu PHY on Windows.
 2. Open bash and run build script.
     ```
     bash
-    ./build_malibu_mcp2210_hidapi_win32.sh
+    ./build_malibu_win32-phy_demo_appl.sh
     ```
 
 ### Run Instructions 
-Make sure that __hidapi.dll__ is alongside __malibu_mcp2210.exe__.
+Make sure that __hidapi.dll__ is alongside __malibu_win32-phy_demo_appl.exe__.
