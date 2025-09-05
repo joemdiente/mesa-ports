@@ -1,29 +1,15 @@
-// Copyright (c) 2004-2020 Microchip Technology Inc. and its subsidiaries.
-// SPDX-License-Identifier: MIT
+//***************************************************************************
+//* Malibu for Windows 32 Sanity Check Example code
+//* 
+//* Author: Joemel John Diente <joemdiente@gmail.com>
+//***************************************************************************
 
-/*
- *****************************************************************************************
-* Revision 0.6  2018/10/23 sunilp
-* Fixed issue related to vtss_phy_10g_init() and commented out the call to vtss_phy_10g_mode_get
-* Revision 0.5  2018/10/03 sunilp
-* Changed MALIBU_EVAL_BOARD to MALIBU_CHAR_BOARD
-* Revision 0.4  2018/08/31 sunilp
-* Added support for different data rates
-* Revision 0.3  2018/07/19 sunilp
-* Modified GPIO functionality to match datasheet documentation and added aggregate interrupt
-* Added SCKOUT/CKOUT support, 10GBASE-KR support
-* Revision 0.2  2018/06/29 sunilp
-* Added GPIO functionality
-* Revision 0.1  2018/06/27 sunilp
-* 0.1 is the first version for the Malibu family of products (VSC8254/57/58(-xx))
- *****************************************************************************************
-
-*/
 #include <vtss_api.h>   // For board initialization
 #include <vtss_appl.h>  // For vtsss_board_t
 #include <vtss_port_api.h>
 #include <malibu_win32-sanity_checks.h> // For board init
 #include "../base/ail/vtss_state.h" // For AIL dumping function
+#include <vtss_phy_10g_api.h> 
 #include <stdarg.h> // For va_list
 
 /* ================================================================= *
@@ -109,6 +95,236 @@ void vtss_callout_trace_printf(const vtss_trace_layer_t layer,
  * END OF API REQUIRED FUNCTIONS
  * ================================================================= */
 
+void appl_sanity_check_phy_init(vtss_inst_t inst) {
+    vtss_port_no_t port_no = 0;
+    vtss_phy_10g_init_parm_t  init_parm;
+    vtss_phy_10g_mode_t     oper_mode;  
+
+    // Configure Only as 10GLAN
+    printf ("Operating MODE for ALL Ports: 0=MODE_10GLAN\n");
+
+    // This loop should always start from the physical Ch0 of the device
+    for (port_no = 0; port_no < 4; port_no++) {
+        printf ("\nConfiguring port %d\n", port_no);
+
+        memset(&oper_mode, 0, sizeof(vtss_phy_10g_mode_t));
+
+        // The following call pre-populates the PHY_INST with initization params
+        init_parm.channel_conf = VTSS_CHANNEL_AUTO;
+        if(vtss_phy_10g_init(inst, port_no, &init_parm) != VTSS_RC_OK) {
+            T_E("vtss_phy_10g_init failed, port %d\n", port_no);
+            printf("vtss_phy_10g_init failed, port %d\n", port_no);
+        }
+
+        // The mode_get is used to retrieve the pre-populated values from the PHY_INST
+        if (vtss_phy_10g_mode_get(inst, port_no, &oper_mode) != VTSS_RC_OK) {
+            T_E("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+            printf("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+        }
+
+        // For 10GLAN
+        {
+            oper_mode.oper_mode = VTSS_PHY_LAN_MODE;
+            oper_mode.interface = VTSS_PHY_SFI_XFI;
+            oper_mode.channel_id = VTSS_CHANNEL_AUTO;
+
+            // h_media/l_media:
+            // --> VTSS_MEDIA_TYPE_SR2_SC (limiting SR/LR/ER/ZR limiting modules)
+            // --> VTSS_MEDIA_TYPE_DAC_SC (Direct Attach Cu Cable)
+            // --> VTSS_MEDIA_TYPE_KR_SC  (10GBASE-KR backplane)
+            // --> VTSS_MEDIA_TYPE_ZR_SC  (linear ZR modules)
+
+            // Assuming SR/LR limiting module on the line side and long traces (> 10 in)
+            // or backplane on the host side
+            oper_mode.h_media = VTSS_MEDIA_TYPE_KR_SC;
+            oper_mode.l_media = VTSS_MEDIA_TYPE_SR2_SC;
+            // oper_mode.l_media = VTSS_MEDIA_TYPE_KR_SC;
+        }
+
+        // Invert Polarity of Line/Host Tx/Rx
+        oper_mode.polarity.line_rx = FALSE;
+        oper_mode.polarity.line_tx = FALSE;
+        oper_mode.polarity.host_rx = FALSE;
+        oper_mode.polarity.host_tx = FALSE;
+        // H/LREFCLK is_high_amp :
+        // --> TRUE (1100mV to 2400mV diff swing)
+        // --> FALSE (200mV to 1200mV diff swing)
+        oper_mode.h_clk_src.is_high_amp = TRUE;
+        oper_mode.l_clk_src.is_high_amp = TRUE;
+
+        /* Setup Port */
+        printf("vtss_phy_10g_mode_set: port %d, oper_mode = %d\n", port_no, oper_mode.oper_mode);
+
+        if (vtss_phy_10g_mode_set(inst, port_no, &oper_mode) != VTSS_RC_OK) {
+            T_E("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+            printf("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+        }
+    }  // End of For loop looping through channels for basic configuration
+
+    // Wait for the chip to stablize -- about 1 sec
+    uint msec = 1000;
+    struct timespec ts;						  \
+    ts.tv_sec = msec / 1000;					  \
+    ts.tv_nsec = (msec % 1000) * 1000000;				  \
+    while(nanosleep(&ts, &ts) == -1 && errno == EINTR) {		  \
+    }
+}
+void appl_sanity_check_read_i2c_sfp(vtss_inst_t inst, vtss_port_no_t port_no) {
+    /* P1 SFP - ch2
+     * GPIO16 = RSEL0
+     * GPIO17 = MOD_DET
+     * GPIO18 = SCK
+     * GPIO19 = SDA
+     * GPIO20 = TXDISABLE
+     * GPIO21 = TXFAULT
+     * GPIO22 = LOS
+     * pull-up = RSEL1
+     */
+
+    if (port_no < 2 || port_no > 3) {
+        printf(" Port Number is not an SFP port\r\n");
+        return;
+    }
+
+    // Copied from mesa/phy_demo_appl/appl/vtss_appl_10g_phy_malibu.c
+    vtss_gpio_10g_gpio_mode_t  gpio_mode;
+    u16 gpio_no;
+    BOOL value;
+    {
+        /* ********************************************************** */
+        // GPIO Output functionality
+        // GPIO_0 -> GPIO_7  This repeats for each of the 4 ports.
+        // In this Example:
+        // 0 = GPIO output 0 from channel 0   - CH0_RS0
+        // 1 = GPIO output 1 from channel 0   - N/A
+        // 2 = GPIO output 2 from channel 0   - CH0_SCL - I2C Master for SFP+
+        // 3 = GPIO output 3 from channel 0   - CH0_SDA - I2C Master for SFP+
+        // 4 = GPIO output 4 from channel 0   - CH0_TX_DIS
+        // 5 = GPIO output 5 from channel 0   - N/A
+        // 6 = GPIO output 6 from channel 0   - N/A
+        // 7 = GPIO output 7 from channel 0   - CH0_LINK_UP
+        //
+        // 8 = GPIO output 0 from channel 1   - CH1_RS0
+        // 9 = GPIO output 1 from channel 1   - N/A
+        // 10 = GPIO output 2 from channel 1  - CH1_SCL - I2C Master for SFP+
+        // 11 = GPIO output 3 from channel 1  - CH1_SDA - I2C Master for SFP+
+        // 12 = GPIO output 4 from channel 1  - CH1_TX_DIS
+        // 13 = GPIO output 5 from channel 1  - N/A
+        // 14 = GPIO output 6 from channel 1  - N/A
+        // 15 = GPIO output 7 from channel 1  - CH1_LINK_UP
+        // .....
+        /* ********************************************************** */
+        u32 val32 = 0;  // <- this is not common
+        /* ********************************************************** */
+        // GPIO used: #0 for Ch0 (CH0_RS0), #8 for Ch1 and so on
+        memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
+        gpio_mode.mode = VTSS_10G_PHY_GPIO_DRIVE_HIGH;
+        gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_NONE;
+        gpio_no = 0 + (port_no*8);
+
+        printf("\nMalibu GPIO Output: Driving HIGH configuration for port %d, gpio %d \n", port_no, gpio_no);
+        if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
+        T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: DRIVE_HIGH/LOW (RS0)\n", port_no, gpio_no);
+        printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
+        }
+
+        /* ********************************************************** */
+        // GPIO used: #4 for Ch0 (CH0_TX_DIS), #12 for Ch1 and so on
+        memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
+        gpio_mode.mode = VTSS_10G_PHY_GPIO_DRIVE_LOW;
+        gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_NONE;
+        gpio_no = 4 + (port_no*8);
+
+        printf("\nMalibu GPIO Output: Driving LOW configuration for port %d, gpio %d \n", port_no, gpio_no);
+        if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
+        T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: DRIVE_HIGH/LOW (TX_DISABLE)\n", port_no, gpio_no);
+        printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
+        }
+    }
+    {
+        // GPIO as I2C Master Interface for SFP+ I2C register readout
+        // GPIO used: #2/#3 (Ch0_SCL and CH0_SDA resp), #10/#11 (Ch1_SCL and CH1_SDA resp) and so on
+        //
+        // Notes:
+        // 1) This GPIO allocation is per channel (A Data/Clk pair per channel),
+        // 2) Based on this allocation, the I2C read/write functions send the commands
+        //    out on those GPIOs assigned to that particular channel.
+        // 3) Slave_ID is fixed at 0x50 (as per the SFP+ Standard, SFF-8472).
+        // 4) The two-wire serial master does not support read-increment instructions.
+
+        // First, assign GPIOs as I2C Master for a particular channel
+        printf("\nMalibu Reading SFP+ I2C registers port %d\n", port_no);
+        /* ********************************************************** */
+        memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
+        gpio_mode.mode = VTSS_10G_PHY_GPIO_OUT;
+        gpio_mode.p_gpio = 0; // GPIO_INTR_CTRL (Dev:1 ch_reg):GPIO_INTR:GPIO0_OUT.SEL0
+        gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_DATA_OUT;
+        gpio_no = 3 + (port_no*8); // This is corrected from phy_demo_appl (old: gpio_no = 2 + (port_no*8); )
+
+        printf("\nMalibu GPIO Output: I2C Master DATA configuration for port %d, gpio %d \n", port_no, gpio_no);
+        if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
+        T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: I2C_MSTR_DATA_OUT\n", port_no, gpio_no);
+        printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
+        }
+
+        memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
+        gpio_mode.mode = VTSS_10G_PHY_GPIO_OUT;
+        gpio_mode.p_gpio = 1; // GPIO_INTR_CTRL (Dev:1 ch_reg):GPIO_INTR:GPIO0_OUT.SEL0 
+        //Joem Notes: what is difference between p_gpio and in_sig??? seems they are the same.
+        //The internal comments hints, p_gpio is per channel gpio. need to check other examples.
+        gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_CLK_OUT;
+        gpio_no = 2 + (port_no*8); // This is corrected from phy_demo_appl (old: gpio_no = 3 + (port_no*8); )
+
+        printf("\nMalibu GPIO Output: I2C Master CLK configuration for port %d, gpio %d \n", port_no, gpio_no);
+        if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
+        T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: I2C_MSTR_CLK_OUT\n", port_no, gpio_no);
+        printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
+        }
+        /* ********************************************************** */
+
+        // By default Slave ID is 50h. Change it to A0h.
+        vtss_phy_10g_i2c_slave_conf_t i2c_conf;
+        memset(&i2c_conf, 0, sizeof(vtss_phy_10g_i2c_slave_conf_t));
+
+        i2c_conf.slave_id = 0b1010000; // Bit shift since slave_id in datasheet is 6:0 only.
+        i2c_conf.prescale = 77;
+        printf ("SLAVE ID (0x%X); PRESCALE (0x%X)\r\n", i2c_conf.slave_id, i2c_conf.prescale);
+        if (vtss_phy_10g_i2c_slave_conf_set(inst, port_no, &i2c_conf) != VTSS_RC_OK) {
+            printf (" Failed to set I2C Conf\r\n");
+            printf (" Exit example code \r\n");
+            return;
+        }
+        // Now call the read or write function with the relevant address and data
+        u16 address = 0x0;
+        u16 data;
+
+        for (address = 0; address < 16; address++) {
+            if (vtss_phy_10g_i2c_read(inst, port_no, address, &data) != VTSS_RC_OK) {
+                T_E("vtss_phy_10g_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gpio_no, address);
+                printf("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gpio_no);
+            } else {
+                printf("Malibu reading I2C register @ addr = %d: value = 0x%X \n", address, data);
+            }
+        }
+    }
+}
+void appl_sanity_check_read_i2c_vendor(vtss_inst_t inst, vtss_port_no_t port_no) {
+    u16 address = 0x0;
+    u16 data;
+    u16 i = 0;
+    char sfp_vendor[16];
+
+    // SFF Specifications SFP Vendor Name Address Range.
+    for (address = 20; address < 36; address++) {
+        if (vtss_phy_10g_i2c_read(inst, port_no, address, &data) != VTSS_RC_OK) {
+            T_E("vtss_phy_10g_i2c_read, port %d, address = 0x%X\n", port_no, address);
+            printf("Malibu Error reading I2C register on SFP+ module for port %d, \n", port_no);
+        } else {
+            sfp_vendor[i++] = (char)data;
+        }
+    }
+    printf("SFP Vendor: %s \r\n", sfp_vendor);    
+}
 /* ********************************************************** */
 /* ********************************************************** */
 /* ******    Test SPI I/O                 ******************* */
@@ -305,20 +521,94 @@ int main(int argc, const char **argv) {
 
   printf ("/* VSC8258EV + MCP2210 hidapi Sanity Checks Example Code */\r\n");
   mac_if = VTSS_PORT_INTERFACE_SFI; // vtss_api/include/vtss/api/types.h used in 10G?
+  /* ********************************************************** */
+  /* ***************    Basic Bring-up      ******************* */
+  /* ********************************************************** */  
+  printf("VTSS_PORT_NO_START = %d\n", VTSS_PORT_NO_START);
+  printf("VTSS_PORTS = %d\n", VTSS_PORTS);
+
+  printf("\nBoard Info --> \n");
+  printf("Board name: %s\n", board->descr);
+  printf("port_no = %d\n", port_no);
+  printf("Board Target: 0x%X\n", board->target);
+
+  printf("Board Inst: %p\n\n", board->inst);
+
+  appl_sanity_check_phy_init(board->inst);
+
+  printf (" End of PHY Initialization \r\n");
 
   /* ****************************************************** */
   /* USER CONFIGURATION                                     */
   /* ****************************************************** */
-  printf (" End of PHY Initialization \r\n");
+  while (1) {
+    printf (" *************************************\n");
+    printf (" Available Example Codes for Sanity Checks\r\n");
+    printf (" *************************************\n");
+    printf (" 1. Read SFP via I2C.\n");
+    printf (" 2. Loopback Test for 1G CuSFP.\n");
+    printf (" 3. \n");
+    printf (" *************************************\n");
+    printf (" Type the number of example to run, then press enter. Type \"exit\" to quit \n");
 
-  printf (" *************************************\n");
-  printf (" Available Example Codes for Sanity Checks\r\n");
-  printf (" *************************************\n");
-  printf (" 1. Loopback Test for 1G CuSFP.\n");
-  printf (" \n");
-  printf (" \n");
-  printf (" *************************************\n");
-  while (1);
+    rc = scanf("%s", &command[0]);
+
+    /* ****************************************************** */
+    if (strcmp(command, "1")  == 0) {
+        system("clear");
+        printf (" *************************************\n");
+        printf (" Running example code #%s\r\n", command);
+        printf (" *************************************\n");
+
+        // Test Read I2C SFP
+        printf (" ********Test Read I2C SFP from Address 0-16********\n");
+        vtss_port_no_t sfp_port = 2;
+        appl_sanity_check_read_i2c_sfp(board->inst, sfp_port);
+        sfp_port = 3;
+        appl_sanity_check_read_i2c_sfp(board->inst, sfp_port);
+
+        // Read Vendor 
+        printf (" ********Read Vendor for Port 2********\n");
+        appl_sanity_check_read_i2c_vendor(board->inst, 2);
+        printf (" ********Read Vendor for Port 3********\n");
+        appl_sanity_check_read_i2c_vendor(board->inst, 3);
+
+        printf (" *************************************\n");
+        printf (" Done.\r\n");
+        printf (" Press anything to go back\r\n");
+        rc = scanf("%s", &command[0]);
+    }
+    /* ****************************************************** */
+    else if (strcmp(command, "2")  == 0) {
+        system("clear");
+        printf (" *************************************\n");
+        printf (" command: %s not yet implemented\r\n", command);
+        printf (" *************************************\n");
+        
+        // Add here code
+        
+        printf (" *************************************\n");
+        printf (" Done.\r\n");
+        printf (" Press anything to go back\r\n");
+    }
+    /* ****************************************************** */
+    else if (strcmp(command, "3")  == 0) {
+        system("clear");
+        printf (" *************************************\n");
+        printf (" command: %s not yet implemented\r\n", command);
+        printf (" *************************************\n");
+        
+        // Add here code
+        
+        printf (" *************************************\n");
+        printf (" Done.\r\n");
+        printf (" Press anything to go back\r\n");
+    }
+    /* ****************************************************** */
+    else if (strcmp(command, "exit")  == 0) {
+        break;
+    }
+  }
 
   return 0; // All done
 

@@ -6,7 +6,9 @@
         "vtss_port_api.h": "c",
         "vtss_state.h": "c",
         "vtss_appl_10g_phy_malibu.h": "c",
-        "vtss_appl.h": "c"
+        "vtss_appl.h": "c",
+        "malibu_win32-sanity_checks.h": "c",
+        "vtss_phy_10g_api.h": "c"
     },
     "cmake.sourceDirectory": "D:/Desktop/mesa-ports/mcp2210-hidapi"
 }

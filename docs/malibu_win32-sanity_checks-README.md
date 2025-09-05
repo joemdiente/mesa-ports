@@ -48,21 +48,21 @@ Make sure that __hidapi.dll__ is alongside __malibu_win32-sanity_checks.exe__.
 ### Available Example Codes
 This can be used for sanity checking.
 
-1. 1G CuSFP loopback.
-
-    Make sure to select correct SFP port.
-    | PCB Label      | Malibu Channel/Port No.  |
-    | ---------------|:------------------------:|
-    | TX/RX IN/OUT0  | CH0                      |
-    | TX/RX IN/OUT0  | CH1                      |
-    | P1             | CH2                      |
-    | P2             | CH3                      |
-
-    #### Plans:
-        Read SFP, make sure it is 1G Cu SFP capable through malibu I2C.
-        Configure PCS for 1G. 
-        Enable Loopback.
-
-2. -- To Do --
+1. Read I2C data of SFP.
+2. 1G CuSFP loopback.
 3. -- To Do --
 3. -- To Do --
+
+Make sure to select correct SFP port.
+| PCB Label      | Malibu Channel/Port No.  |
+| ---------------|:------------------------:|
+| TX/RX IN/OUT0  | CH0                      |
+| TX/RX IN/OUT0  | CH1                      |
+| P1             | CH2                      |
+| P2             | CH3                      |
+
+#### Plans:
+    Read SFP, make sure it is 1G Cu SFP capable through malibu I2C.
+    Configure PCS for 1G. 
+    Enable Loopback.
+
