@@ -264,7 +264,7 @@ void appl_sanity_check_read_i2c_sfp(vtss_inst_t inst, vtss_port_no_t port_no) {
         printf("\nMalibu GPIO Output: I2C Master DATA configuration for port %d, gpio %d \n", port_no, gpio_no);
         if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
         T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: I2C_MSTR_DATA_OUT\n", port_no, gpio_no);
-        printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
+        printf(" Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
         }
 
         memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
@@ -275,38 +275,34 @@ void appl_sanity_check_read_i2c_sfp(vtss_inst_t inst, vtss_port_no_t port_no) {
         gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_CLK_OUT;
         gpio_no = 2 + (port_no*8); // This is corrected from phy_demo_appl (old: gpio_no = 3 + (port_no*8); )
 
-        printf("\nMalibu GPIO Output: I2C Master CLK configuration for port %d, gpio %d \n", port_no, gpio_no);
+        printf("\n Malibu GPIO Output: I2C Master CLK configuration for port %d, gpio %d \n", port_no, gpio_no);
         if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
         T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: I2C_MSTR_CLK_OUT\n", port_no, gpio_no);
-        printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
-        }
-        /* ********************************************************** */
-
-        // By default Slave ID is 50h. Change it to A0h.
-        vtss_phy_10g_i2c_slave_conf_t i2c_conf;
-        memset(&i2c_conf, 0, sizeof(vtss_phy_10g_i2c_slave_conf_t));
-
-        i2c_conf.slave_id = 0b1010000; // Bit shift since slave_id in datasheet is 6:0 only.
-        i2c_conf.prescale = 77;
-        printf ("SLAVE ID (0x%X); PRESCALE (0x%X)\r\n", i2c_conf.slave_id, i2c_conf.prescale);
-        if (vtss_phy_10g_i2c_slave_conf_set(inst, port_no, &i2c_conf) != VTSS_RC_OK) {
-            printf (" Failed to set I2C Conf\r\n");
-            printf (" Exit example code \r\n");
-            return;
-        }
-        // Now call the read or write function with the relevant address and data
-        u16 address = 0x0;
-        u16 data;
-
-        for (address = 0; address < 16; address++) {
-            if (vtss_phy_10g_i2c_read(inst, port_no, address, &data) != VTSS_RC_OK) {
-                T_E("vtss_phy_10g_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gpio_no, address);
-                printf("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gpio_no);
-            } else {
-                printf("Malibu reading I2C register @ addr = %d: value = 0x%X \n", address, data);
-            }
+        printf(" Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
         }
     }
+}
+
+void appl_sanity_check_read_i2c_address(vtss_inst_t inst, vtss_port_no_t port_no, u16 start_addr, u16 length) {
+    u16 addr = 0x00;
+    u16 data;
+    u16 i = 0;
+    char sfp_vendor[16];
+
+    if (start_addr >= length) {
+        printf(" length should be less than start_address\r\n");
+        return;
+    }
+
+    for (addr = start_addr; addr < length; addr++) {
+        if (vtss_phy_10g_i2c_read(inst, port_no, addr, &data) != VTSS_RC_OK) {
+            T_E("vtss_phy_10g_i2c_read, port %d, address = 0x%X\n", port_no, addr);
+            printf(" Malibu Error reading I2C register on SFP+ module for port %d\n", port_no);
+        } else {
+            printf(" Malibu reading I2C register @ addr = %d: value = 0x%X \n", addr, data);
+        }
+    }
+    printf("\r\n");    
 }
 void appl_sanity_check_read_i2c_vendor(vtss_inst_t inst, vtss_port_no_t port_no) {
     u16 address = 0x0;
@@ -318,12 +314,18 @@ void appl_sanity_check_read_i2c_vendor(vtss_inst_t inst, vtss_port_no_t port_no)
     for (address = 20; address < 36; address++) {
         if (vtss_phy_10g_i2c_read(inst, port_no, address, &data) != VTSS_RC_OK) {
             T_E("vtss_phy_10g_i2c_read, port %d, address = 0x%X\n", port_no, address);
-            printf("Malibu Error reading I2C register on SFP+ module for port %d, \n", port_no);
+            printf(" Malibu Error reading I2C register on SFP+ module for port %d, \n", port_no);
         } else {
             sfp_vendor[i++] = (char)data;
         }
     }
-    printf("SFP Vendor: %s \r\n", sfp_vendor);    
+    printf(" SFP Vendor: %s \r\n", sfp_vendor);
+    printf("\r\n");
+}
+
+void appl_sanity_check_cusfp_lb(vtss_inst_t inst, vtss_port_no_t port_no) {
+
+    return;
 }
 /* ********************************************************** */
 /* ********************************************************** */
@@ -560,14 +562,17 @@ int main(int argc, const char **argv) {
         printf (" Running example code #%s\r\n", command);
         printf (" *************************************\n");
 
-        // Test Read I2C SFP
-        printf (" ********Test Read I2C SFP from Address 0-16********\n");
+        printf (" ********Configure SFP GPIO and I2C********\n");
         vtss_port_no_t sfp_port = 2;
-        appl_sanity_check_read_i2c_sfp(board->inst, sfp_port);
+        appl_sanity_check_sfp_config(board->inst, sfp_port);
         sfp_port = 3;
         appl_sanity_check_read_i2c_sfp(board->inst, sfp_port);
 
-        // Read Vendor 
+        printf (" ********Test Read I2C SFP Port 2 from Address 0-16********\n");
+        appl_sanity_check_read_i2c_address(board->inst, 2, 0, 16);
+        printf (" ********Test Read I2C SFP Port 3 from Address 0-16********\n");
+        appl_sanity_check_read_i2c_address(board->inst, 3, 0, 16);
+
         printf (" ********Read Vendor for Port 2********\n");
         appl_sanity_check_read_i2c_vendor(board->inst, 2);
         printf (" ********Read Vendor for Port 3********\n");
@@ -576,20 +581,22 @@ int main(int argc, const char **argv) {
         printf (" *************************************\n");
         printf (" Done.\r\n");
         printf (" Press anything to go back\r\n");
-        rc = scanf("%s", &command[0]);
+        getch();
     }
     /* ****************************************************** */
     else if (strcmp(command, "2")  == 0) {
         system("clear");
         printf (" *************************************\n");
-        printf (" command: %s not yet implemented\r\n", command);
+        printf (" Running example code #%s\r\n", command);
         printf (" *************************************\n");
-        
-        // Add here code
+
+        printf (" ********Cu SFP Loopback Test********\n");
+        appl_sanity_check_cusfp_lb(board->inst, 2);
         
         printf (" *************************************\n");
         printf (" Done.\r\n");
         printf (" Press anything to go back\r\n");
+        getch();
     }
     /* ****************************************************** */
     else if (strcmp(command, "3")  == 0) {
@@ -603,6 +610,7 @@ int main(int argc, const char **argv) {
         printf (" *************************************\n");
         printf (" Done.\r\n");
         printf (" Press anything to go back\r\n");
+        getch();
     }
     /* ****************************************************** */
     else if (strcmp(command, "exit")  == 0) {
