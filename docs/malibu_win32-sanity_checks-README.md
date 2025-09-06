@@ -1,7 +1,7 @@
-# Malibu phy_demo_appl for Win32 using MCP2210-HIDAPI
+# Malibu sanity checks Example Code for Win32 using MCP2210-HIDAPI
 
 This code uses a library called MCP2210-HIDAPI to be able to run 
-phy_demo_appl for Malibu PHY on Windows.
+some codes for sanity checking for Malibu PHY on Windows. See below for available examples
 
 ## Hardware Setup
 * MCP2210 Breakout Module - [ADM00419](https://www.microchip.com/en-us/development-tool/adm00419)
@@ -49,7 +49,15 @@ Make sure that __hidapi.dll__ is alongside __malibu_win32-sanity_checks.exe__.
 This can be used for sanity checking.
 
 1. Read I2C data of SFP.
+    ```
+        Configures SFP GPIO, TXDIS, RS0, and I2C SDA/SCL
+        Reads SFP I2C EEPROM Address 0 to 15.
+        Reads SFP Vendor Address 20 to 35
+    ```
 2. 1G CuSFP loopback.
+    ```
+    
+    ```
 3. -- To Do --
 3. -- To Do --
 
@@ -58,11 +66,7 @@ Make sure to select correct SFP port.
 | ---------------|:------------------------:|
 | TX/RX IN/OUT0  | CH0                      |
 | TX/RX IN/OUT0  | CH1                      |
-| P1             | CH2                      |
-| P2             | CH3                      |
+| P1 (SFP)       | CH2                      |
+| P2 (SFP)       | CH3                      |
 
-#### Plans:
-    Read SFP, make sure it is 1G Cu SFP capable through malibu I2C.
-    Configure PCS for 1G. 
-    Enable Loopback.
 
