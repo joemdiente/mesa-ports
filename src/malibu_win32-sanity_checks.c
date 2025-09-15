@@ -11,6 +11,7 @@
 #include "../base/ail/vtss_state.h" // For AIL dumping function
 #include <vtss_phy_10g_api.h> 
 #include <stdarg.h> // For va_list
+#include <conio.h> //getch()
 
 /* ================================================================= *
  *  Board init.
@@ -169,7 +170,9 @@ void appl_sanity_check_phy_init(vtss_inst_t inst) {
     while(nanosleep(&ts, &ts) == -1 && errno == EINTR) {		  \
     }
 }
-void appl_sanity_check_read_i2c_sfp(vtss_inst_t inst, vtss_port_no_t port_no) {
+
+// Start of I2C Examples
+void appl_sanity_check_sfp_config(vtss_inst_t inst, vtss_port_no_t port_no) {
     /* P1 SFP - ch2
      * GPIO16 = RSEL0
      * GPIO17 = MOD_DET
@@ -322,8 +325,32 @@ void appl_sanity_check_read_i2c_vendor(vtss_inst_t inst, vtss_port_no_t port_no)
     printf(" SFP Vendor: %s \r\n", sfp_vendor);
     printf("\r\n");
 }
+// End of I2C Examples
 
 void appl_sanity_check_cusfp_lb(vtss_inst_t inst, vtss_port_no_t port_no) {
+    // vtss_phy_10g_mode_t oper_mode;
+
+    // memset(&oper_mode, 0, sizeof(vtss_phy_10g_mode_t));
+
+    // if (vtss_phy_10g_mode_get(inst, port_no, &oper_mode) != VTSS_RC_OK) {
+    //    T_E("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+    //    printf("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+    // }
+    // // Set PHY to Repeater Mode
+    // oper_mode.oper_mode = VTSS_PHY_REPEATER_MODE;
+    // oper_mode.h_media = VTSS_MEDIA_TYPE_SR2_SC;
+    // oper_mode.l_media = VTSS_MEDIA_TYPE_SR2_SC;
+
+    // if (vtss_phy_10g_mode_set(inst, port_no, &oper_mode) != VTSS_RC_OK) {
+    //   T_E("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+    //   printf("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+    // }
+
+    // Set PHY Loopback (L3 or H2)
+    // vtss_phy_10g_loopback_t lpback;
+    // lpback.lb_type = VTSS_LB_L3;
+    // lpback.enable = 1;
+    // vtss_phy_10g_loopback_set(inst, port_no, &lpback);
 
     return;
 }
@@ -566,7 +593,7 @@ int main(int argc, const char **argv) {
         vtss_port_no_t sfp_port = 2;
         appl_sanity_check_sfp_config(board->inst, sfp_port);
         sfp_port = 3;
-        appl_sanity_check_read_i2c_sfp(board->inst, sfp_port);
+        appl_sanity_check_sfp_config(board->inst, sfp_port);
 
         printf (" ********Test Read I2C SFP Port 2 from Address 0-16********\n");
         appl_sanity_check_read_i2c_address(board->inst, 2, 0, 16);

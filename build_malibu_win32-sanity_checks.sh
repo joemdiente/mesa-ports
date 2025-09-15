@@ -71,28 +71,28 @@ HIDAPI_INC="${MCP2210_HIDAPI_DIR}/include/hidapi/"
 MCP2210_HIDAPI_SRC="${MCP2210_HIDAPI_DIR}/src/*.c"
 MCP2210_HIDAPI_ARGS="./*.o -L${MCP2210_HIDAPI_DIR}/x64/ -lhidapi" 
 
-echo -n "[1] Building MCP2210-HIDAPI Objects"
+echo -n "[1] Building MCP2210-HIDAPI Objects - "
 rm -rf ./*.o
 gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} 
 gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-gpio.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC} 
 gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-spi.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC}
 gcc -c ${MCP2210_HIDAPI_DIR}/src/mcp2210-hidapi-misc.c -I${MCP2210_HIDAPI_INC} -I${HIDAPI_INC}
 if [ $? -ne 0 ]; then
-  echo " - failed."
+  echo " failed."
 else
-  echo " - successful."
+  echo " successful."
 fi
 
-echo -n "[2] Copy hidapi.dll alongside *.exe"
+echo -n "[2] Copy hidapi.dll alongside *.exe - "
 rm -rf ./hidapi.dll
 cp ${MCP2210_HIDAPI_DIR}/x64/hidapi.dll ./
 if [ $? -ne 0 ]; then
-  echo " - failed."
+  echo " failed."
 else
-  echo " - successful."
+  echo " successful."
 fi
 
-echo -n "[3] Building malibu_win32-sanity_checks" 
+echo -n "[3] Building malibu_win32-sanity_checks - " 
 rm -rf ./*.exe
 gcc --static \
   -I ${MESA_INC_DIR} \
@@ -109,10 +109,10 @@ gcc --static \
   ${MCP2210_HIDAPI_ARGS} \
   -o malibu_win32-sanity_checks
 if [ $? -ne 0 ]; then
-  echo " - failed."
+  echo " failed."
   echo "malibu_win32-sanity_checks.exe compilation failed."
 else
-  echo " - successful."
+  echo " successful."
   echo "malibu_win32-sanity_checks.exe compilation was successful."
 fi
 
