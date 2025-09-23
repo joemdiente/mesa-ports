@@ -13,6 +13,14 @@
 #include <stdarg.h> // For va_list
 #include <conio.h> //getch()
 
+// Wait for the chip to stablize -- about 1 sec
+void wait_for_one_sec() {
+    uint msec = 1000;
+    struct timespec ts;
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+    while(nanosleep(&ts, &ts) == -1 && errno == EINTR);
+}
 /* ================================================================= *
  *  Board init.
  * ================================================================= */
@@ -354,6 +362,70 @@ void appl_sanity_check_cusfp_lb(vtss_inst_t inst, vtss_port_no_t port_no) {
 
     return;
 }
+BOOL  vtss_appl_malibu_status_get(vtss_inst_t   inst, vtss_port_no_t   port_no)
+{
+  // Port Status
+  vtss_phy_10g_status_t status;
+  vtss_phy_10g_cnt_t    cnt;
+
+    printf("%-12s %-12s %-16s %-12s %-12s\n", "", "Link", "Link-down-event", "Rx-Fault-Sticky", "Tx-Fault-Sticky");
+
+    if (vtss_phy_10g_status_get(inst, port_no, &status) != VTSS_RC_OK) {
+        T_E("vtss_phy_10g_status_get failed, port %d", port_no);
+        printf ("vtss_phy_10g_status_get failed, port %d", port_no);
+        return (FALSE);
+    }
+
+    printf ("Port %u:\n", port_no);
+    printf ("--------\n");
+    printf ("%-12s %-12s %-16s %-12s %-12s\n", "Line PMA:", status.pma.rx_link?"Yes":"No",
+              status.pma.link_down ? "Yes" : "No", status.pma.rx_fault ? "Yes" : "No", status.pma.tx_fault ? "Yes" : "No");
+    printf ("%-12s %-12s %-16s %-12s %-12s\n", "Host PMA:", status.hpma.rx_link?"Yes":"No",
+            status.hpma.link_down ? "Yes" : "No", status.hpma.rx_fault ? "Yes" : "No", status.hpma.tx_fault ? "Yes" : "No");
+    printf ("%-12s %-12s %-16s %-12s %-12s\n", "Line PCS:", status.pcs.rx_link ? "Yes" : "No",
+            status.pcs.link_down ? "Yes" : "No", status.pcs.rx_fault ? "Yes" : "No", status.pcs.tx_fault ? "Yes" : "No");
+    printf ("%-12s %-12s %-16s %-12s %-12s\n", "Host PCS:", status.hpcs.rx_link ? "Yes" : "No",
+            status.hpcs.link_down ? "Yes" : "No", status.hpcs.rx_fault ? "Yes" : "No", status.hpcs.tx_fault ? "Yes" : "No");
+    printf ("%-12s %-12s %-16s %-12s %-12s\n", "XAUI Status:", status.xs.rx_link ? "Yes" : "No",
+            status.xs.link_down ? "Yes" : "No", status.xs.rx_fault ? "Yes" : "No", status.xs.tx_fault ? "Yes" : "No");
+    printf ("%-12s %-12s \n", "Line 1G PCS:", status.lpcs_1g ? "Yes" : "No");
+    printf ("%-12s %-12s \n", "Host 1G PCS:", status.hpcs_1g ? "Yes" : "No");
+    printf ("%-12s %-12s \n", "Link UP:", status.status ? "Yes" : "No");
+    printf ("%-12s %-12s \n", "Block lock:", status.block_lock ? "Yes" : "No");
+    printf ("%-12s %-12s \n", "LOPC status:", status.lopc_stat ? "Yes" : "No");
+
+    if (vtss_phy_10g_cnt_get(inst, port_no, &cnt) != VTSS_RC_OK) {
+        T_E("vtss_phy_10g_cnt_get failed, port %d", port_no);
+        printf ("vtss_phy_10g_cnt_get failed, port %d", port_no);
+        return (FALSE);
+    }
+    printf ("\n");
+    printf ("PCS counters:\n");
+    printf ("%-20s %-12s\n", "  Block_lacthed:", cnt.pcs.block_lock_latched ? "Yes" : "No");
+    printf ("%-20s %-12s\n", "  High_ber_latched:", cnt.pcs.high_ber_latched ? "Yes" : "No");
+    printf ("%-20s %-12d\n", "  Ber_cnt:", cnt.pcs.ber_cnt);
+    printf ("%-20s %-12d\n", "  Err_blk_cnt:", cnt.pcs.err_blk_cnt);
+    printf ("\n");
+
+    return(TRUE);
+}
+
+BOOL vtss_appl_malibu_reg_dump(vtss_inst_t inst, vtss_port_no_t port_no){
+    /* ********************************************************** */
+    /* ******    DEBUG REG PRINT OUT          ******************* */
+    /* ********************************************************** */
+
+    vtss_debug_printf_t pr = (vtss_debug_printf_t) printf;
+    printf("\n==========================================================\n");
+    printf("Debug Reg Dump for Port %d\n", port_no);
+    if (vtss_phy_10g_debug_register_dump(inst, pr, FALSE, port_no) != VTSS_RC_OK) {
+      T_E("vtss_phy_10g_debug_register_dump, port %d\n", port_no);
+      printf("vtss_phy_10g_debug_register_dump, port %d\n", port_no);
+    }
+    printf("==========================================================\n");
+
+    return(TRUE);
+}
 /* ********************************************************** */
 /* ********************************************************** */
 /* ******    Test SPI I/O                 ******************* */
@@ -640,6 +712,10 @@ int main(int argc, const char **argv) {
         getch();
     }
     /* ****************************************************** */
+    else if(strcmp(command, "0") == 0) {
+        vtss_appl_malibu_status_get(board->inst, 2);
+        vtss_appl_malibu_reg_dump(board->inst, 2);
+    }
     else if (strcmp(command, "exit")  == 0) {
         break;
     }
