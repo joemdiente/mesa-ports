@@ -336,30 +336,75 @@ void appl_sanity_check_read_i2c_vendor(vtss_inst_t inst, vtss_port_no_t port_no)
 // End of I2C Examples
 
 void appl_sanity_check_cusfp_lb(vtss_inst_t inst, vtss_port_no_t port_no) {
-    // vtss_phy_10g_mode_t oper_mode;
+    
+    // To Do
+    // Transfer SFP enable pins here from _sfp_config
+    printf(" 1G CuSFP Loopback Example in Channel %d \r\n", (int)port_no);
+    // printf(" Configuring SFP TX DIS and RS0\r\n");
 
-    // memset(&oper_mode, 0, sizeof(vtss_phy_10g_mode_t));
+    // vtss_gpio_10g_gpio_mode_t  gpio_mode;
+    // u16 gpio_no;
+    // BOOL value;
+    // // GPIO used: #0 for Ch0 (CH0_RS0), #8 for Ch1 and so on
+    // memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
+    // gpio_mode.mode = VTSS_10G_PHY_GPIO_DRIVE_HIGH;
+    // gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_NONE;
+    // gpio_no = 0 + (port_no*8);
 
-    // if (vtss_phy_10g_mode_get(inst, port_no, &oper_mode) != VTSS_RC_OK) {
-    //    T_E("vtss_phy_10g_mode_get failed, port %d\n", port_no);
-    //    printf("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+    // printf("\nMalibu GPIO Output: Driving HIGH configuration for port %d, gpio %d \n", port_no, gpio_no);
+    // if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
+    // T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: DRIVE_HIGH/LOW (RS0)\n", port_no, gpio_no);
+    // printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
     // }
-    // // Set PHY to Repeater Mode
-    // oper_mode.oper_mode = VTSS_PHY_REPEATER_MODE;
-    // oper_mode.h_media = VTSS_MEDIA_TYPE_SR2_SC;
-    // oper_mode.l_media = VTSS_MEDIA_TYPE_SR2_SC;
 
-    // if (vtss_phy_10g_mode_set(inst, port_no, &oper_mode) != VTSS_RC_OK) {
-    //   T_E("vtss_phy_10g_mode_set failed, port %d\n", port_no);
-    //   printf("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+    // /* ********************************************************** */
+    // // GPIO used: #4 for Ch0 (CH0_TX_DIS), #12 for Ch1 and so on
+    // memset(&gpio_mode, 0, sizeof(vtss_gpio_10g_gpio_mode_t));
+    // gpio_mode.mode = VTSS_10G_PHY_GPIO_DRIVE_LOW;
+    // gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_NONE;
+    // gpio_no = 4 + (port_no*8);
+
+    // printf("\nMalibu GPIO Output: Driving LOW configuration for port %d, gpio %d \n", port_no, gpio_no);
+    // if (vtss_phy_10g_gpio_mode_set(inst, port_no, gpio_no, &gpio_mode) != VTSS_RC_OK) {
+    // T_E("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: DRIVE_HIGH/LOW (TX_DISABLE)\n", port_no, gpio_no);
+    // printf("Malibu Error setting GPIO Output configuration for port %d, gpio %d \n", port_no, gpio_no);
     // }
+
+    // printf(" SFP TXDIS and RS0 config done. \r\n");
+    printf(" Link Partner should show link up!! \r\n");
+    wait_for_one_sec();
+
+    // Set PHY to Repeater Mode
+    printf(" Configuring port for REPEATER MODE - ");
+    vtss_phy_10g_mode_t oper_mode;
+    memset(&oper_mode, 0, sizeof(vtss_phy_10g_mode_t));
+
+    if (vtss_phy_10g_mode_get(inst, port_no, &oper_mode) != VTSS_RC_OK) {
+       T_E("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+       printf("vtss_phy_10g_mode_get failed, port %d\n", port_no);
+    }
+
+    oper_mode.oper_mode = VTSS_PHY_REPEATER_MODE;
+    oper_mode.rate = VTSS_RPTR_RATE_1_25; // 1G Data Rate when Repeater Mode
+    oper_mode.h_media = VTSS_MEDIA_TYPE_SR2_SC;
+    oper_mode.l_media = VTSS_MEDIA_TYPE_SR2_SC;
+    
+    if (vtss_phy_10g_mode_set(inst, port_no, &oper_mode) != VTSS_RC_OK) {
+      T_E("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+      printf("vtss_phy_10g_mode_set failed, port %d\n", port_no);
+    }
+    printf(" done.\r\n");
 
     // Set PHY Loopback (L3 or H2)
-    // vtss_phy_10g_loopback_t lpback;
-    // lpback.lb_type = VTSS_LB_L3;
-    // lpback.enable = 1;
-    // vtss_phy_10g_loopback_set(inst, port_no, &lpback);
-
+    printf(" Configuring Loopback - ");
+    vtss_phy_10g_loopback_t lpback;
+    lpback.lb_type = VTSS_LB_L3;
+    lpback.enable = 1;
+    if(vtss_phy_10g_loopback_set(inst, port_no, &lpback) != VTSS_RC_OK) {
+        printf(" failed\r\n");
+        return;
+    }
+    printf(" done.\r\n");
     return;
 }
 BOOL  vtss_appl_malibu_status_get(vtss_inst_t   inst, vtss_port_no_t   port_no)
