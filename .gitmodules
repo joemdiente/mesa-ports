@@ -4,3 +4,6 @@
 [submodule "mesa"]
 	path = mesa
 	url = https://github.com/joemdiente/mesa
+[submodule "sw-mepa"]
+	path = sw-mepa
+	url = git@github.com:joemdiente/sw-mepa.git
