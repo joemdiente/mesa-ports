@@ -40,7 +40,7 @@
 #include <linux/gpio.h>
 #include "rpi_spi.h"
 
-#define DEV_SPI "/dev/spidev0.0"	/* SPI Device Node */
+#define DEV_SPI "/dev/spidev0.1"	/* SPI Device Node */
 #define SPI_MSG_SIZE 1				/* Message Size for SPI */
 
 static int8_t spi_fd = 0;			/* File Descriptor for SPI */

@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run GDBServer in Target",
+            "command": "cd mepa_app_sama7_malibu && make && ./transfer_to_dut.sh && ssh root@192.168.137.221 'gdbserver :9999 ~/malibu10_sanity_check_app'", 
+            "type": "shell"
+        }
+    ]
+}

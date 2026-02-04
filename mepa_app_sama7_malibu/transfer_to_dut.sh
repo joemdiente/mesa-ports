@@ -3,7 +3,9 @@
 #clear keys
 if [ "$1" = "clear_keys" ];
     then
+        echo "Clearing keys..."
         ssh-keygen -f '/home/test/.ssh/known_hosts' -R '192.168.137.221'
+        echo "Make sure to answer \"yes\"."
 fi
 
 #transfer files to DUT
