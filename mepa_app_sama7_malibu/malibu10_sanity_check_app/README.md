@@ -1,0 +1,1 @@
+use CMAKE_TOOLCHAIN_FILE=/opt/mscc/sama7-toolchain/share/buildroot/toolchainfile.cmake

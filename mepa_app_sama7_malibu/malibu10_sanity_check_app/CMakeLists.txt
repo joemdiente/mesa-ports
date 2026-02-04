@@ -4,7 +4,7 @@ project(malibu10_sanity_check_app C)
 set(CMAKE_BUILD_TYPE "Release")
 
 # 1. Define Paths (Mirroring your MEPA_CMAKE_BUILD_DIR)
-set(MEPA_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../sw-mepa/build")
+set(MEPA_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../sw-mepa/build")
 
 # 2. Executable and Sources
 add_executable(malibu10_sanity_check_app 

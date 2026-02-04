@@ -2,3 +2,4 @@ hidapi.dll
 *.o
 *.exe
 
+mepa_app_sama7_malibu/build/
