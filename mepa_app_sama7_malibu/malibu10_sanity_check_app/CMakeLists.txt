@@ -3,7 +3,7 @@ project(malibu10_sanity_check_app C)
 
 set(CMAKE_BUILD_TYPE "Release")
 
-option(mepa_app_new_api "Build malibu10_sanity_check_app using new API else build phy-demo-appl" ON)
+option(mepa_app_new_api "Build malibu10_sanity_check_app using new API else build phy-demo-appl" OFF)
 
 if (mepa_app_new_api)
     # 1. Define Paths
@@ -63,7 +63,8 @@ else()
     # 2. Collect Source Files
     # Explicitly listed files
     set(SOURCES
-        ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_board_malibu.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/mepa_appl_phy_demo_appl_malibu.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/linux_spidev.c
         ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_10g_phy_malibu.c
         ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_macsec_demo.c
         ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_ts_demo.c
@@ -96,13 +97,16 @@ else()
         -DVTSS_USE_STDINT_H
         -D_INCLUDE_DEBUG_TERM_PRINT_
         -DMALIBU_CHAR_BOARD
+        -DLINUX_SPIDEV
         -DVTSS_FEATURE_MACSEC
         -DVTSS_OPT_PHY_TIMESTAMP
     )
     # 4. Define Include Directories
     include_directories(
+        ${MESA_PHY_DEMO_APPL_DIR}/
         ${MESA_PHY_DEMO_APPL_DIR}/../include
         ${MESA_PHY_DEMO_APPL_DIR}/../base/phy/phy_10g
+        ${CMAKE_CURRENT_SOURCE_DIR}/
     )
 
     # 5. Compile Definitions (Macros)
