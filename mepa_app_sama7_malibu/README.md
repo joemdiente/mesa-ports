@@ -2,7 +2,9 @@
 # MEPA Sample Applications
 
 Available sample applications:
-- mepa_app_sanity_check = Use for checking test setup.
+- mepa_app_sanity_check = Use for checking test setup. 
+    - Do not follow "How to use" in this README.md.
+    - Please refer to `mepa_app_sanity_check/README.md`
 - mepa_app_gpio_demo =
 - mepa_app_port_linkup =
 - mepa_app_warm_startup =

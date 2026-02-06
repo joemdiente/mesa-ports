@@ -21,6 +21,8 @@
  *
  */
 
+/// This is rpi_spi.c but refactored for phy_demo_appl
+
 #include <stdarg.h> // For va_list
 #include <unistd.h>     // For TCP read/write
 #include <sys/stat.h>// For /sys/class/mdio file status
@@ -38,7 +40,7 @@
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <linux/gpio.h>
-#include "linux_spidev.h"
+#include "rpi_spi_vtss.h"
 
 #define SPI_MSG_SIZE 1				/* Message Size for SPI */
 

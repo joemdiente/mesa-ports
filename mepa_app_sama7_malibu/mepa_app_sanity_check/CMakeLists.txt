@@ -9,7 +9,7 @@ if (mepa_app_new_api)
     # 1. Define Paths
     set(MEPA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../sw-mepa")
     set(MEPA_BUILD_DIR "${MEPA_DIR}/build")
-    set(SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    set(SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
     set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
     # 2. Executable and Sources
@@ -64,8 +64,8 @@ else() #Build phy_demo_appl
     # 2. Collect Source Files
     # Explicitly listed files
     set(SOURCES
-        ${SOURCES_DIR}/mepa_appl_phy_demo_appl_malibu.c
-        ${SOURCES_DIR}/linux_spidev.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/mepa_appl_phy_demo_appl_malibu.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/rpi_spi_vtss.c
         ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_10g_phy_malibu.c
         ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_macsec_demo.c
         ${MESA_PHY_DEMO_APPL_DIR}/appl/vtss_appl_ts_demo.c
@@ -107,10 +107,11 @@ else() #Build phy_demo_appl
         ${MESA_PHY_DEMO_APPL_DIR}/
         ${MESA_PHY_DEMO_APPL_DIR}/../include
         ${MESA_PHY_DEMO_APPL_DIR}/../base/phy/phy_10g
-        ${INC_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
     # 5. Compile Definitions (Macros)
-    add_executable(mepa_app_sanity_check ${SOURCES})
+    add_executable(mepa_app_sanity_check 
+            "${SOURCES}")
 
 endif()

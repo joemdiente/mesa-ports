@@ -20,7 +20,7 @@
 #include "vtss/api/options.h"
 
 //RPI_SPI
-#include "linux_spidev.h"
+#include "rpi_spi_vtss.h"
 
 // Define which trace group to use for VTSS printout in this file
 #define VTSS_TRACE_GROUP VTSS_TRACE_GROUP_PHY
@@ -57,7 +57,7 @@ int malibu_linux_spidev_board_init(int argc, const char **argv, vtss_appl_board_
 {
     char* spidev;
     // Arguments
-    if (argc > 1) {
+    if (argc > 2) {
         if (strcmp(argv[1],"-h") == 0) {
         printf(" Help File: \r\n \
             Options:\
@@ -70,7 +70,7 @@ int malibu_linux_spidev_board_init(int argc, const char **argv, vtss_appl_board_
             spidev = (char*)argv[2];
         }
     }
-    if (argc == 0) {
+    if (argc < 2) {
         printf("Error: Require Arguments. See -h\r\n");
         exit(EXIT_FAILURE);
     }
@@ -85,7 +85,7 @@ int malibu_linux_spidev_board_init(int argc, const char **argv, vtss_appl_board_
     board->init.init_conf->spi_32bit_read_write = *linux_spidev_32bit_read_write; // Set pointer to the SPI read function for this board.
 
     //Initialize linux_spidev
-    printf("Initialize linux spidev.c\r\n");
+    printf("Initialize rpi_spi_vtss\r\n");
     if(spi_initialize(spidev)) {
         printf("Error spi_initialize()\r\n \
             Exiting...\r\n");
