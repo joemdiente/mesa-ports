@@ -77,8 +77,6 @@ void appl_mem_free(struct mepa_callout_ctx *ctx, void *ptr);
 // SPI IO Test - ref: vtss_appl_10g_phy_malibu.c
 void appl_malibu_spi_io_test(mepa_callout_t *callout, mepa_callout_ctx_t *callout_ctx);
 
-// Must create external application
-extern mepa_rc __attribute__((weak)) mepa_ext_appl(mepa_callout_t *callout, mepa_callout_ctx_t *callout_ctx);
 // *****************************************************************************
 // *****************************************************************************
 // Section: MEPA Structs
@@ -234,11 +232,6 @@ mepa_callout_t appl_rpi_spi =
 
     // rc = mepa_debug_info_dump(appl_malibu_device[2], (mesa_debug_printf_t) printf, &mepa_dbg);
 
-    printf("Entering External Application\r\n");
-    if (mepa_ext_appl == NULL) {
-        printf("No External Application Attached\r\n");
-        exit(1);
-    }
     return 0;
 }
 
