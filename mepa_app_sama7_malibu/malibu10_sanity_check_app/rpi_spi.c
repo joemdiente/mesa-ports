@@ -48,7 +48,7 @@ static int8_t spi_fd = 0;			/* File Descriptor for SPI */
 /* Initialize Variables */
 static uint8_t mode = SPI_MODE_0;
 static uint8_t bits = 8;
-static uint64_t speed = 1000000;				/* 1 MHz */
+static uint64_t speed = 15000000;				/* 15 MHz */
 
 char rpi_spi_buffer[16];
 //ENDOF MJ Addition

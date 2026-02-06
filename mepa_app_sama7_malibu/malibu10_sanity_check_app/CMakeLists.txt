@@ -3,7 +3,7 @@ project(malibu10_sanity_check_app C)
 
 set(CMAKE_BUILD_TYPE "Release")
 
-option(mepa_app_new_api "Build malibu10_sanity_check_app using new API else build phy-demo-appl" OFF)
+option(mepa_app_new_api "Build malibu10_sanity_check_app using new API else build phy-demo-appl" ON)
 
 if (mepa_app_new_api)
     # 1. Define Paths
@@ -53,7 +53,6 @@ if (mepa_app_new_api)
     target_link_libraries(malibu10_sanity_check_app PRIVATE 
         ${MEPA_BUILD_DIR}/mepa/libmepa.a
         ${MEPA_BUILD_DIR}/mepa/libmepa_common.a
-        ${MEPA_BUILD_DIR}/mepa/vtss/libmepa_drv_vtss.a
         ${MEPA_BUILD_DIR}/mepa/vtss/libmepa_drv_vtss_custom.a
     )
 else()
