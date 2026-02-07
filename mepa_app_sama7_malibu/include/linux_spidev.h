@@ -12,7 +12,14 @@
 // Section: Global Variables
 // *****************************************************************************
 // *****************************************************************************
-
+#include "my_debug.h"
+#include <stdint.h>
+typedef struct {
+    uint8_t mode;
+    uint8_t bits;
+    uint32_t speed;
+    char* spidev;
+} spi_conf_t;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -21,6 +28,6 @@
 // *****************************************************************************
 
 // Initialize SPIDEV
-int spi_initialize(char* spidev);
-
+int spi_initialize(spi_conf_t);
+int spi_malibu_test_code(void);
 #endif /*__LINUX_SPIDEV_*/

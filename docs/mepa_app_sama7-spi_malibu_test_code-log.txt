@@ -1,0 +1,27 @@
+Expected output:
+
+[root@joem-sama7 ~]$ ./mepa_app_sample_applications -t
+[DEBUG: Entered main]
+ test_mode = 0
+Using spidev: /dev/spidev0.1
+[DEBUG: Entered spi_initialize]
+[DEBUG: Entered spi_malibu_test_code]
+[DEBUG: Entered spi_32bit_malibu_write_spidev]
+[DEBUG: Entered spi_transfer]
+Write value: 0x55AA55AA
+
+[DEBUG: Entered spi_32bit_malibu_read_spidev]
+[DEBUG: Entered spi_transfer]
+[DEBUG: Entered spi_transfer]
+Read value = 0x000055AA
+Expected value: 0x000055AA
+Write value != read value due to upper 16-bit unwritable/read-only (0x0000)
+[DEBUG: Entered spi_32bit_malibu_read_spidev]
+[DEBUG: Entered spi_transfer]
+[DEBUG: Entered spi_transfer]
+DEV_ID: 0x00008258
+Expected DEV_ID value: 0x00008258
+
+Malibu SPI Test Done
+Make sure to reset PHY
+[root@joem-sama7 ~]$
