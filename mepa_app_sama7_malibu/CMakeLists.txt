@@ -5,10 +5,10 @@ set(CMAKE_BUILD_TYPE "Release")
 
 # option(mepa_app_port_linkup "Build mepa_app_sanity_check using mepa else build phy-demo-appl" ON)
 
-
 # Define Paths
 set(MEPA_MAIN_ENTRY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(MEPA_MAIN_ENTRY_INC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(MEPA_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../sw-mepa/build")
 
 # Executable and Sources
 add_executable(mepa_app_sample_applications 
@@ -19,6 +19,7 @@ add_executable(mepa_app_sample_applications
 # Include Directories
 target_include_directories(mepa_app_sample_applications PRIVATE 
     ${MEPA_MAIN_ENTRY_INC}/
+    ${MEPA_BUILD_DIR}/include_common
 )
 
 # Compile Definitions (Macros)
@@ -35,8 +36,8 @@ target_compile_options(mepa_app_sample_applications PRIVATE
 )
 
 # Link Static Libraries
-# target_link_libraries(mepa_app_sample_applications PRIVATE 
-#     ${MEPA_BUILD_DIR}/mepa/libmepa.a
-#     ${MEPA_BUILD_DIR}/mepa/libmepa_common.a
-#     ${MEPA_BUILD_DIR}/mepa/vtss/libmepa_drv_vtss_custom.a
-# )
+target_link_libraries(mepa_app_sample_applications PRIVATE 
+    ${MEPA_BUILD_DIR}/mepa/libmepa.a
+    ${MEPA_BUILD_DIR}/mepa/libmepa_common.a
+    ${MEPA_BUILD_DIR}/mepa/vtss/libmepa_drv_vtss_custom.a
+)

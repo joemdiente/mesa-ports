@@ -30,4 +30,14 @@ typedef struct {
 // Initialize SPIDEV
 int spi_initialize(spi_conf_t);
 int spi_malibu_test_code(void);
+int spi_32bit_malibu_read_spidev(  void* inst,
+		                              uint8_t port_no,
+                                  uint8_t dev,
+                                  uint16_t reg_num,
+                                  uint32_t *value);
+int spi_32bit_malibu_write_spidev(  void* inst,
+		                              uint8_t port_no,
+                                  uint8_t dev,
+                                  uint16_t reg_num,
+                                  uint32_t *value);
 #endif /*__LINUX_SPIDEV_*/

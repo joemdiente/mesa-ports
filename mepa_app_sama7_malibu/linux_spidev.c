@@ -175,6 +175,8 @@ int spi_32bit_malibu_read_spidev(  void* inst,
   *value |= bit_seq_rx[4] << 16;
   *value |= bit_seq_rx[5] << 8;
   *value |= bit_seq_rx[6];
+  PRINT_RES("Received value", *value);
+  
   return 0;
 }
 
