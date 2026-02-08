@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 project(mepa_app_sama7_malibu C)
 
 set(CMAKE_BUILD_TYPE "Release")
@@ -8,7 +8,8 @@ set(CMAKE_BUILD_TYPE "Release")
 # Define Paths
 set(MEPA_MAIN_ENTRY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(MEPA_MAIN_ENTRY_INC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(MEPA_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../sw-mepa/build")
+set(MEPA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../sw-mepa/")
+set(MEPA_BUILD_DIR "${MEPA_DIR}/build")
 
 # Executable and Sources
 add_executable(mepa_app_sample_applications 
@@ -35,9 +36,35 @@ target_compile_options(mepa_app_sample_applications PRIVATE
     -Wno-error=incompatible-pointer-types
 )
 
-# Link Static Libraries
-target_link_libraries(mepa_app_sample_applications PRIVATE 
-    ${MEPA_BUILD_DIR}/mepa/libmepa.a
-    ${MEPA_BUILD_DIR}/mepa/libmepa_common.a
-    ${MEPA_BUILD_DIR}/mepa/vtss/libmepa_drv_vtss_custom.a
-)
+set(MEPA_USE_DOT_A OFF)
+if (MEPA_USE_DOT_A) 
+    # Link Static Libraries
+    target_link_libraries(mepa_app_sample_applications PRIVATE 
+        ${MEPA_BUILD_DIR}/mepa/libmepa.a
+        ${MEPA_BUILD_DIR}/mepa/libmepa_common.a
+        ${MEPA_BUILD_DIR}/mepa/vtss/libmepa_drv_vtss_custom.a
+    )
+else()
+    # Add mepa_api
+    include(FetchContent)
+    set(MEPA_vtss ON CACHE BOOL "" FORCE)
+    set(MEPA_vtss_opt_10g ON CACHE BOOL "" FORCE)
+    set(BUILD_MEPA_DEMO OFF CACHE BOOL "" FORCE)
+    set(MEPA_vtss_opt_1g ON CACHE BOOL "" FORCE)
+    set(MEPA_vtss_opt_ts ON CACHE BOOL "" FORCE)
+    set(MEPA_vtss_opt_macsec ON CACHE BOOL "" FORCE)
+    set(CMAKE_BUILD_TYPE Debug)
+
+    FetchContent_Declare(
+    mepa
+    SOURCE_DIR "${MEPA_DIR}"
+    )
+
+    #  Bring the targets into the project
+    FetchContent_MakeAvailable(mepa)
+
+    # Link against the library produced by proj_B
+    target_link_libraries(mepa_app_sample_applications PRIVATE mepa)
+endif()
+
+

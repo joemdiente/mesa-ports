@@ -54,6 +54,16 @@
 // *****************************************************************************
 extern __attribute__((weak)) int mepa_app_sample_appl(); // Use "weak" so it is NULL in memory.
 
+// Required by MEPA
+void *mem_alloc(struct mepa_callout_ctx *ctx, size_t size)
+{
+    return malloc(size);
+}
+
+void mem_free(struct mepa_callout_ctx *ctx, void *ptr)
+{
+    free(ptr);
+}
 // *****************************************************************************
 // *****************************************************************************
 // Section: MEPA Structs
@@ -132,6 +142,8 @@ int main(int argc, char* argv[]) {
     // Assign callout
     callout.spi_read = spi_32bit_malibu_read_spidev;
     callout.spi_write = spi_32bit_malibu_write_spidev;
+    callout.mem_alloc = mem_alloc;
+    callout.mem_free = mem_free;
     // callout.lock_enter = ;
     // callout.lock_exit = ;
 
