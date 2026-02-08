@@ -3,8 +3,24 @@
     "tasks": [
         {
             "label": "Run GDBServer in Target",
-            "command": "cd mepa_app_sama7_malibu && make && ./transfer_to_dut.sh && ssh root@192.168.137.221 'gdbserver :9999 ~/malibu10_sanity_check_app'", 
-            "type": "shell"
+            "command": "cd mepa_app_sama7_malibu/build && make && ../transfer_to_dut.sh debug", 
+            "type": "shell",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": [
+                    {
+                        "regexp": ".", 
+                        "file": 1,
+                        "location": 2,
+                        "message": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Starting server.*", 
+                    "endsPattern": "^.*Listening on port 9999.*" 
+                }
+            }
         }
     ]
 }
