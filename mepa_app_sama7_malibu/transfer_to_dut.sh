@@ -23,6 +23,6 @@ if [ "$1" = "debug" ];
         echo "Starting debug session...\r\n"
         ssh root@192.168.137.221 'kill -9 $(pidof gdbserver) 2>/dev/null'
         echo "Kill any existing gdbserver instances...\r\n"
-        ssh root@192.168.137.221 'gdbserver :9999 ~/mepa_app_sample_applications'
+        ssh root@192.168.137.221 'gdbserver :9999 ~/mepa_app_sample_applications -d /dev/spidev0.1 > /dev/ttyS0'
 fi
 echo "\r\nDone."

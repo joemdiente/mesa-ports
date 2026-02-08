@@ -14,6 +14,7 @@
 // *****************************************************************************
 #include "my_debug.h"
 #include <stdint.h>
+#include <linux/spi/spidev.h>
 typedef struct {
     uint8_t mode;
     uint8_t bits;

@@ -61,7 +61,7 @@ typedef uint8_t malibu_spi_slave_inst_bit_seq_t[MALIBU_BIT_SEQ_BYTE_COUNT];
 #define MALIBU_BYTE_COUNT_PER_TRANSACTION 14
 malibu_spi_slave_inst_bit_seq_t dummy_bit_seq;
 spi_conf_t spi_conf;
-int fd = 0;
+static int fd;
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize SPI
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,9 +69,11 @@ int spi_initialize(spi_conf_t conf) {
 
   PRINT_FUN();
   int ret = 0;
-  spi_conf = conf;
+
+  //Open SPI device
   fd = open(conf.spidev, O_RDWR);
-  if (ret < 0 || fd < 0) {
+
+  if (ret < 0 || fd <= 0) {
     PRINT_RES("Error opening spidev", ret);
     PRINT_RES(conf.spidev,ret);
     return ret;
@@ -114,6 +116,12 @@ int spi_initialize(spi_conf_t conf) {
 int spi_transfer(int fd, uint8_t *tx, uint8_t *rx, uint32_t len) {
 
   PRINT_FUN();
+
+  if (fd <= 0) {
+    fprintf(stderr, "Invalid File Descriptor: %d\n", fd);
+    return -1;
+  }
+
   struct spi_ioc_transfer tr = {
     .tx_buf = (unsigned long)tx,
     .rx_buf = (unsigned long)rx,
@@ -160,7 +168,7 @@ int spi_32bit_malibu_read_spidev(  void* inst,
   //bit_seq_tx[3] Don't Care "data" field
 
   // Transmit Bit Sequence
-  ret = spi_transfer(fd, (uint8_t*)bit_seq_tx, NULL, MALIBU_BIT_SEQ_BYTE_COUNT);
+  ret = spi_transfer(fd, (uint8_t*)bit_seq_tx, 0, MALIBU_BIT_SEQ_BYTE_COUNT);
   if (ret < 0) {
       PRINT_RES("Failed to Trasmit 1st bit sequence",ret);
   }

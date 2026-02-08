@@ -69,8 +69,17 @@ void mem_free(struct mepa_callout_ctx *ctx, void *ptr)
 // Section: MEPA Structs
 // *****************************************************************************
 // *****************************************************************************
-mepa_callout_t callout;
-mepa_callout_ctx_t *callout_ctx;
+mepa_callout_t callout = {
+
+    // Assign callout
+    .spi_read = spi_32bit_malibu_read_spidev,
+    .spi_write = spi_32bit_malibu_write_spidev,
+    .mem_alloc = mem_alloc,
+    .mem_free = mem_free,
+    // .lock_enter = ,
+    // .lock_exit = 
+};
+mepa_callout_ctx_t callout_ctx[MALIBU_EVB_PORT_COUNT];
 mepa_board_conf_t board_conf = {};
 mepa_device_t *phy[MALIBU_EVB_PORT_COUNT];
 // *****************************************************************************
@@ -128,8 +137,8 @@ int main(int argc, char* argv[]) {
     spi_conf_t dev_spi;
     dev_spi.spidev = spidev;
     dev_spi.bits = 8;
-    dev_spi.mode = 0;
-    dev_spi.speed = 1000000; //1 MHz
+    dev_spi.mode = SPI_MODE_0;
+    dev_spi.speed = 15000000; //1 MHz
     
     ret = spi_initialize(dev_spi);
     if (test_mode == 1) {
@@ -139,30 +148,34 @@ int main(int argc, char* argv[]) {
     /* MEPA Initialization
      * Take ./sw-mepa/mepa_demo/mepa_apps/phy_port_config.c as an example.
      */ 
-    // Assign callout
-    callout.spi_read = spi_32bit_malibu_read_spidev;
-    callout.spi_write = spi_32bit_malibu_write_spidev;
-    callout.mem_alloc = mem_alloc;
-    callout.mem_free = mem_free;
-    // callout.lock_enter = ;
-    // callout.lock_exit = ;
+    memset(&board_conf, 0, sizeof(board_conf));
 
     // Create MEPA Devices
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        phy[port_no] = mepa_create(&callout, &callout_ctx[MALIBU_EVB_PORT_COUNT], &board_conf);
+        board_conf.numeric_handle = port_no;
+
+        memset(&callout_ctx[port_no], 0, sizeof(callout_ctx));
+        callout_ctx[port_no].port_no = port_no;
+
+        // Create MEPA device for this port. The MEPA device will be used by the application to call MEPA APIs for this port.
+        phy[port_no] = mepa_create(&callout, &callout_ctx[port_no], &board_conf);
+        
         if (phy[port_no]) {
             printf("Phy has been probed on port %d\r\n", port_no);
-            if ((ret = mepa_link_base_port(phy[port_no],
-                                        MALIBU_BASE_PORT,
-                                        port_no)) != MESA_RC_OK) {
-                printf(" Error in Linking base port to Port  : %d\n", port_no);
-            }
         }
         else {
             printf("Failed to probe PHY, port_no: %d\r\n", port_no);
             exit(EXIT_FAILURE);
         }
     }
+
+    // Link to base port since we're dealing with a quad-port PHY.
+            //     // Base Port is already initialized; Link (Share Resource) other ports to base port.
+            // if (port_no != MALIBU_BASE_PORT) {
+            //     if (mepa_link_base_port(phy[port_no], phy[MALIBU_BASE_PORT], port_no) != MESA_RC_OK) {
+            //         printf(" Error in Linking base port to Port  : %d\n", port_no);
+            //     }
+            // }
 
     // Attach here sample application
     printf("Jump to Sample Application.\r\n");
