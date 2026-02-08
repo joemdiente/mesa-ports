@@ -41,7 +41,7 @@
 #include "microchip/ethernet/phy/api.h"
 #include "microchip/ethernet/board/api.h"
 #include "main.h"
-
+appl_inst_t inst;
 // *****************************************************************************
 // *****************************************************************************
 // Section: Function prototypes
@@ -123,25 +123,25 @@ int main(int argc, char* argv[]) {
     /* MEPA Initialization
      * Take ./sw-mepa/mepa_demo/mepa_apps/phy_port_config.c as an example.
      */ 
-    memset(&board_conf, 0, sizeof(board_conf));
+    memset(&inst.board_conf, 0, sizeof(inst.board_conf));
 
     // Create MEPA Devices
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
 
-        memset(&callout_ctx[port_no], 0, sizeof(callout_ctx[port_no]));
+        memset(&inst.callout_ctx[port_no], 0, sizeof(inst.callout_ctx[port_no]));
 
         //Register Callouts (All of these are required)
-        memset(&callout[port_no], 0, sizeof(callout[port_no]));
-        callout[port_no].spi_read = spi_32bit_malibu_read_spidev;
-        callout[port_no].spi_write = spi_32bit_malibu_write_spidev;
-        callout[port_no].mem_alloc = mem_alloc;
-        callout[port_no].mem_free = mem_free;
-        board_conf.numeric_handle = port_no;
+        memset(&inst.callout[port_no], 0, sizeof(inst.callout[port_no]));
+        inst.callout[port_no].spi_read = spi_32bit_malibu_read_spidev;
+        inst.callout[port_no].spi_write = spi_32bit_malibu_write_spidev;
+        inst.callout[port_no].mem_alloc = mem_alloc;
+        inst.callout[port_no].mem_free = mem_free;
+        inst.board_conf.numeric_handle = port_no;
 
         // Create MEPA device for this port. The MEPA device will be used by the application to call MEPA APIs for this port.
-        phy[port_no] = mepa_create(&callout, &callout_ctx[port_no], &board_conf);
+        inst.phy[port_no] = mepa_create(&inst.callout[port_no], &inst.callout_ctx[port_no], &inst.board_conf);
         
-        if (phy[port_no]) {
+        if (inst.phy[port_no]) {
             printf("Phy has been probed on port %d\r\n", port_no);
         }
         else {
@@ -157,6 +157,10 @@ int main(int argc, char* argv[]) {
     if (mepa_app_sample_appl == NULL) {
         printf("Error: No Sample Application\r\n");
         exit(EXIT_FAILURE);
+    }
+    else {
+        // Pass all required MEPA instance to sample application.
+        mepa_app_sample_appl(&inst);
     }
     exit(EXIT_SUCCESS);
 }
