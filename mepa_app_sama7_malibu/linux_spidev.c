@@ -27,8 +27,8 @@
 //* API on a VSC8258EV from any linux device that supports spidev.
 //* This code tries to be a reuseable code.
 //***************************************************************************
-#define MY_DEBUG
-#define MY_DEBUG_SHOW_ADVANCED
+// #define MY_DEBUG
+// #define MY_DEBUG_SHOW_ADVANCED
 #include "my_debug.h"
 // *****************************************************************************
 // *****************************************************************************

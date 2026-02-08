@@ -40,20 +40,13 @@
 #include "linux_spidev.h"
 #include "microchip/ethernet/phy/api.h"
 #include "microchip/ethernet/board/api.h"
-// *****************************************************************************
-// *****************************************************************************
-// Section: Macros and Constant defines
-// *****************************************************************************
-// *****************************************************************************
-#define MALIBU_EVB_PORT_COUNT 4
-#define MALIBU_BASE_PORT 0
+#include "main.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Function prototypes
 // *****************************************************************************
 // *****************************************************************************
-extern __attribute__((weak)) int mepa_app_sample_appl(); // Use "weak" so it is NULL in memory.
-
 // Required by MEPA
 void *mem_alloc(struct mepa_callout_ctx *ctx, size_t size)
 {
@@ -64,24 +57,6 @@ void mem_free(struct mepa_callout_ctx *ctx, void *ptr)
 {
     free(ptr);
 }
-// *****************************************************************************
-// *****************************************************************************
-// Section: MEPA Structs
-// *****************************************************************************
-// *****************************************************************************
-mepa_callout_t callout = {
-
-    // Assign callout
-    .spi_read = spi_32bit_malibu_read_spidev,
-    .spi_write = spi_32bit_malibu_write_spidev,
-    .mem_alloc = mem_alloc,
-    .mem_free = mem_free,
-    // .lock_enter = ,
-    // .lock_exit = 
-};
-mepa_callout_ctx_t callout_ctx[MALIBU_EVB_PORT_COUNT];
-mepa_board_conf_t board_conf = {};
-mepa_device_t *phy[MALIBU_EVB_PORT_COUNT];
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Variables
@@ -152,10 +127,16 @@ int main(int argc, char* argv[]) {
 
     // Create MEPA Devices
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        board_conf.numeric_handle = port_no;
 
-        memset(&callout_ctx[port_no], 0, sizeof(callout_ctx));
-        callout_ctx[port_no].port_no = port_no;
+        memset(&callout_ctx[port_no], 0, sizeof(callout_ctx[port_no]));
+
+        //Register Callouts (All of these are required)
+        memset(&callout[port_no], 0, sizeof(callout[port_no]));
+        callout[port_no].spi_read = spi_32bit_malibu_read_spidev;
+        callout[port_no].spi_write = spi_32bit_malibu_write_spidev;
+        callout[port_no].mem_alloc = mem_alloc;
+        callout[port_no].mem_free = mem_free;
+        board_conf.numeric_handle = port_no;
 
         // Create MEPA device for this port. The MEPA device will be used by the application to call MEPA APIs for this port.
         phy[port_no] = mepa_create(&callout, &callout_ctx[port_no], &board_conf);
@@ -167,15 +148,9 @@ int main(int argc, char* argv[]) {
             printf("Failed to probe PHY, port_no: %d\r\n", port_no);
             exit(EXIT_FAILURE);
         }
-    }
 
-    // Link to base port since we're dealing with a quad-port PHY.
-            //     // Base Port is already initialized; Link (Share Resource) other ports to base port.
-            // if (port_no != MALIBU_BASE_PORT) {
-            //     if (mepa_link_base_port(phy[port_no], phy[MALIBU_BASE_PORT], port_no) != MESA_RC_OK) {
-            //         printf(" Error in Linking base port to Port  : %d\n", port_no);
-            //     }
-            // }
+        // mepa_driver_link_base_port not implemented on Malibu(??)
+    }
 
     // Attach here sample application
     printf("Jump to Sample Application.\r\n");
