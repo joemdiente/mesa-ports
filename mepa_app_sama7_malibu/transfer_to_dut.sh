@@ -6,7 +6,7 @@ DUT_IP=192.168.137.221
 if [ "$1" = "clear-keys" ];
     then
         echo "Clearing keys..."
-        ssh-keygen -f '/home/test/.ssh/known_hosts' -R \'$DUT_IP\'
+        ssh-keygen -f '/home/test/.ssh/known_hosts' -R $DUT_IP
         echo "========================================================================================"
         echo "Make sure to answer \"yes\" when asked to continue connecting..."
         echo "If target is asking for password, make sure host .pub key is in target's authorized_keys"
