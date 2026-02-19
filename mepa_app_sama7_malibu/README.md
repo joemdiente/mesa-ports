@@ -8,7 +8,7 @@ Available sample applications:
 - mepa_app_gpio_demo =
 - mepa_app_port_linkup =
 - mepa_app_warm_startup =
-- mepa_app_power_modes =
+- mepa_app_power_modes = Try different power modes in a menu.
 - mepa_app_cable_diag =
 
 ## How to use:
