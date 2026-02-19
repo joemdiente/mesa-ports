@@ -89,26 +89,27 @@ int mepa_app_sample_appl(appl_inst_t *inst)
             printf("Failed to get current port configuration for port %d\r\n", port_no);
         }
     }
-    
-    // PHY Configuration
-    conf.speed = MESA_SPEED_10G;
-    conf.conf_10g.oper_mode = MEPA_PHY_LAN_MODE;
-    conf.conf_10g.interface_mode = MEPA_PHY_SFI_XFI;
-    conf.conf_10g.channel_id = MEPA_CHANNELID_NONE;
-    conf.conf_10g.xfi_pol_invert = 1;
-    conf.conf_10g.polarity.host_rx = false;
-    conf.conf_10g.polarity.line_rx = false;
-    conf.conf_10g.polarity.host_tx = false;
-    conf.conf_10g.polarity.line_tx = (port_no < 2)? false : true;
-    conf.conf_10g.is_host_wan = false;
-    conf.conf_10g.lref_for_host = false;
-    conf.conf_10g.h_clk_src_is_high_amp = true;
-    conf.conf_10g.l_clk_src_is_high_amp = true;
-    conf.conf_10g.h_media = MEPA_MEDIA_TYPE_DAC;
-    conf.conf_10g.l_media = MEPA_MEDIA_TYPE_DAC;
-    conf.conf_10g.channel_high_to_low = false;
 
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
+
+        // PHY Configuration
+        conf.speed = MESA_SPEED_10G;
+        conf.conf_10g.oper_mode = MEPA_PHY_LAN_MODE;
+        conf.conf_10g.interface_mode = MEPA_PHY_SFI_XFI;
+        conf.conf_10g.channel_id = MEPA_CHANNELID_NONE;
+        conf.conf_10g.xfi_pol_invert = 1;
+        conf.conf_10g.polarity.host_rx = false;
+        conf.conf_10g.polarity.line_rx = false;
+        conf.conf_10g.polarity.host_tx = false;
+        conf.conf_10g.polarity.line_tx = (port_no < 2)? false : true;
+        conf.conf_10g.is_host_wan = false;
+        conf.conf_10g.lref_for_host = false;
+        conf.conf_10g.h_clk_src_is_high_amp = true;
+        conf.conf_10g.l_clk_src_is_high_amp = true;
+        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_DAC;
+        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_DAC;
+        conf.conf_10g.channel_high_to_low = false;
+
         if (mepa_conf_set(inst->phy[port_no], &conf) == 0) {
             printf("Port %d configuration success.\r\n", port_no);
         } else {
@@ -133,16 +134,21 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         "Auto",
     };
 
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        if (mepa_poll(inst->phy[port_no], &status) == 0) {
-            printf("Port: %d, Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", port_no, portspeed2txt[status.speed], \
-            status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
-        } else {
-             printf("Port %d poll failed.\r\n", port_no);
+    while(1) {
+        printf("\033[2J\033[H");
+        printf(" MEPA Poll Link Information per Port \r\n");
+        for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
+            if (mepa_poll(inst->phy[port_no], &status) == 0) {
+                printf("Port: %d, Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", port_no, portspeed2txt[status.speed], \
+                status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
+            } else {
+                printf("Port %d poll failed.\r\n", port_no);
+            }
         }
+        fflush(stdout);
+        sleep(1);
     }
-    
-    // 5. Simple - Connect to VSC7514EV
+
     
     return ret;
 }
