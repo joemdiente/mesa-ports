@@ -21,8 +21,11 @@
  */
 
 /*
- * Template Test
- * Make sure to add documentation in this simple app.
+ * This is a simple MEPA application sample to demonstrate basic MEPA API usage on the SAMA7G5 and Malibu EVB.
+ * There is no associated documentation for this sample. It has the simpliest setup.
+ * Setup:
+ *  SAMA7G5 Curiosity Kit + VSC8258EV
+ *  Connect SPI MikroBus 2 to VSC8258EV SPI header
  * 
  */
 // *****************************************************************************

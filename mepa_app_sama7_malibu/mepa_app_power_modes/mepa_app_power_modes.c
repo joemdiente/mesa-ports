@@ -21,8 +21,12 @@
  */
 
 /*
- * Template Test
- * Make sure to add documentation in this simple app.
+ * This is an example for configuring power modes in MEPA.
+ * Setup:
+ *  In Nominal mode, see current (in ampere) lowers.
+ *  In ActiPHY mode, https://ww1.microchip.com/downloads/en/Appnotes/VPPD-01962.pdf
+ *  In Dynamic mode, PerfectReach (works by determining the cable length and lowering the power for ports with short cables)
+ *  In Enabled mode, both ActiPHY and PerfectReach are enabled together at link-up. This is the recommended mode for power saving.
  * 
  */
 // *****************************************************************************
