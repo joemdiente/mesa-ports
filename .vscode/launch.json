@@ -5,7 +5,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/mepa_app_sama7_malibu/build/mepa_app_sample_applications",
+            "program": "${workspaceRoot}/mepa_app_sama7_malibu/build/mepa_app_port_linkup",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -32,7 +32,7 @@
         "name": "(gdb) Attach",
         "type": "cppdbg",
         "request": "attach",
-        "program": "${workspaceRoot}/mepa_app_sama7_malibu/malibu10_sanity_check_app",
+        "program": "${workspaceRoot}/mepa_app_sama7_malibu/build/mepa_app_port_linkup",
         "MIMode": "gdb",
         "setupCommands": [
             {

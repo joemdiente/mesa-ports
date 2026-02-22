@@ -37,6 +37,17 @@
 #include "my_debug.h"
 #include <stdbool.h>
 
+// Create a "wrapper" for 10G GPIOs.
+#include <vtss_phy_10g_api.h>
+#include <vtss_phy_api.h>
+typedef vtss_gpio_10g_gpio_mode_t mepa_gpio_malibu_10g_gpio_mode_t;
+typedef vtss_gpio_10g_no_t mepa_gpio_malibu_10g_no_t;
+
+mepa_rc mepa_malibu_10g_gpio_mode_set(appl_inst_t* inst, mepa_port_no_t port_no, mepa_gpio_malibu_10g_no_t gpio_no, mepa_gpio_malibu_10g_gpio_mode_t* mode) {
+
+    return (mepa_rc)vtss_phy_10g_gpio_mode_set((vtss_inst_t)inst, (vtss_port_no_t)port_no, (vtss_gpio_10g_no_t)gpio_no, (vtss_gpio_10g_gpio_mode_t*) &mode);
+}
+
 /*
  * Note: This function is only compatible with Malibu PHYs.
  */
@@ -51,6 +62,7 @@ int configure_malibu_gpios(appl_inst_t *inst, uint32_t dev_id)
     mepa_port_no_t port_no = 0;
     uint16_t gpio_no = 0;
     mepa_bool_t value = 0;
+    mepa_gpio_malibu_10g_gpio_mode_t gpio_mode;
     /* ********************************************************** */
     // Below note was taken from vtss_appl_10g_phy_malibu.c
     // GPIO Output functionality
@@ -135,25 +147,33 @@ int configure_malibu_gpios(appl_inst_t *inst, uint32_t dev_id)
     // GPIO used: #2/#3 (Ch0_SCL and CH0_SDA resp), #10/#11 (Ch1_SCL and CH1_SDA resp) and so on
 
     printf(" Drive I2C SDA pins \r\n");
+    gpio_mode.mode = VTSS_10G_PHY_GPIO_OUT;
+    gpio_mode.p_gpio = 0;
+    gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_DATA_OUT;
+
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
         gpio_no = 2 + (port_no * 8);
         if (mepa_gpio_out_set(inst->phy[port_no], gpio_no, 1) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
+            printf("I2C Data GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
         } else {
             printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
         }
     }
 
     printf(" Configure I2C SCL pins \r\n");
+    gpio_mode.mode = VTSS_10G_PHY_GPIO_OUT;
+    gpio_mode.p_gpio = 0;
+    gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_CLK_OUT;
+
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
         gpio_no = 3 + (port_no * 8);
          if (mepa_gpio_out_set(inst->phy[port_no], gpio_no, 1) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
+            printf("I2C Clock GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
         } else {
             printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
         }
     }
-    
+
     return 0;
 }
 
