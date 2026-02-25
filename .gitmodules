@@ -7,3 +7,6 @@
 [submodule "sw-mepa"]
 	path = sw-mepa
 	url = git@github.com:joemdiente/sw-mepa.git
+[submodule "mdio-tools"]
+	path = mdio-tools
+	url = https://github.com/wkz/mdio-tools.git
