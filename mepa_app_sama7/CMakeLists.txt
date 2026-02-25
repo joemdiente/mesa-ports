@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(mepa_app_sama7_malibu C)
+project(mepa_app_sama7 C)
 
 set(CMAKE_BUILD_TYPE "Debug")
 

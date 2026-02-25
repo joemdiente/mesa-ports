@@ -13,7 +13,7 @@ Available sample applications:
 
 ## How to use:
 
-1. Make sure you are in `mepa_app_sama7_malibu` root directory.
+1. Make sure you are in `mepa_app_sama7` root directory.
 2. `$ mkdir ./build/ && cd ./build/`
 3. `$ cmake ../${your_desired_sample_app}/ -DCMAKE_TOOLCHAIN_FILE=${your_toolchainfile.cmake}`
 

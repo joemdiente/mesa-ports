@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "Run GDBServer in Target",
-            "command": "cd mepa_app_sama7_malibu/build && make && ../transfer_to_dut.sh debug", 
+            "command": "cd mepa_app_sama7/build && make && ../transfer_to_dut.sh debug", 
             "type": "shell",
             "isBackground": true,
             "problemMatcher": {
