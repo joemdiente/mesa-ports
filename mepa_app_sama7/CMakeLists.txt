@@ -27,6 +27,7 @@ set(BUILD_MEPA_DEMO OFF CACHE BOOL "" FORCE)
 set(MEPA_vtss_opt_1g ON CACHE BOOL "" FORCE)
 set(MEPA_vtss_opt_ts ON CACHE BOOL "" FORCE)
 set(MEPA_vtss_opt_macsec ON CACHE BOOL "" FORCE)
+set(MEPA_lan884x ON CACHE BOOL "" FORCE)
 set(CMAKE_BUILD_TYPE Debug)
 
 FetchContent_Declare(
@@ -36,6 +37,9 @@ SOURCE_DIR "${MEPA_DIR}"
 
 #  Bring the targets into the project
 FetchContent_MakeAvailable(mepa)
+
+option(MEPA_1G_PHY "Builds mepa app for lan884x or 1G single PHY" OFF)
+option(MEPA_10G_PHY "Builds mepa app for malibu EVB" ON)
 
 # CMake Options
 # By default, builds main entry point without sample application.
