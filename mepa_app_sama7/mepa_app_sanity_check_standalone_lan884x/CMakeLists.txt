@@ -27,11 +27,15 @@ mepa
 SOURCE_DIR "${MEPA_DIR}"
 )
 
-# 3. Executable and Sources
+# 3. Find libmnl in buildroot SDK
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBMNL REQUIRED libmnl)
+
+# 4. Executable and Sources
 add_executable(mepa_app_sanity_check_lan884x 
     ${SOURCES_DIR}/mepa_appl_custom_lan884x.c 
     ${SOURCES_DIR}/sama7_mdio.c
-    ${MDIO_TOOLS_DIR}
+    ${MDIO_TOOLS_DIR}/src/mdio/mdio.c
 )
 
 # 4. Include Directories
@@ -41,6 +45,7 @@ target_include_directories(mepa_app_sanity_check_lan884x PRIVATE
     ${INC_DIR}/
     ${MDIO_TOOLS_DIR}/include
     ${MDIO_TOOLS_DIR}/src/mdio/
+    ${LIBMNL_INCLUDE_DIRS}/
 )
 
 # 5. Compile Definitions (Macros)
@@ -61,4 +66,7 @@ FetchContent_MakeAvailable(mepa)
 
 # 8. Link Static Libraries
 # Using absolute paths as per your original Makefile
-target_link_libraries(mepa_app_sanity_check_lan884x PRIVATE mepa)
+target_link_libraries(mepa_app_sanity_check_lan884x PRIVATE 
+    ${LIBMNL_LIBRARIES}
+    mepa
+)

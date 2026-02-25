@@ -1,6 +1,5 @@
 hidapi.dll
 *.o
 *.exe
-
 mepa_app_sama7/build/
 mepa_app_sama7/mepa_app_sanity_check_standalone_*/build/
