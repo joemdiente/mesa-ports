@@ -35,7 +35,7 @@ pkg_check_modules(LIBMNL REQUIRED libmnl)
 # 4. Executable and Sources
 add_executable(mepa_app_sanity_check_lan884x 
     ${SOURCES_DIR}/mepa_appl_custom_lan884x.c 
-    ${SOURCES_DIR}/sama7_mdio.c
+    ${SOURCES_DIR}/linux_mdio.c
     ${MDIO_TOOLS_DIR}/src/mdio/mdio.c
 )
 
@@ -44,7 +44,7 @@ target_include_directories(mepa_app_sanity_check_lan884x PRIVATE
     ${MEPA_DIR}/mepa/include/
     ${MEPA_DIR}/me/include/
     ${INC_DIR}/
-    ${MDIO_TOOLS_DIR}/include
+    ${MDIO_TOOLS_DIR}/include/
     ${MDIO_TOOLS_DIR}/src/mdio/
     ${LIBMNL_INCLUDE_DIRS}/
 )

@@ -28,43 +28,31 @@
 // Section: Header Includes
 // *****************************************************************************
 // *****************************************************************************
-
-// Standard C includes
 #include <stdio.h>
-#include <unistd.h>     // For usleep()
-#include <stdint.h>
-
-// MEPA includes
+#include <stdlib.h>
+#include <string.h>
 #include "microchip/ethernet/phy/api.h"
-
-// Other includes
-#include "sama7_mdio.h"        // For the MDIO accessor functions
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Macros and Constant defines
-// *****************************************************************************
-// *****************************************************************************
-
-// Macros for debug levels:
-// APPL_TRACE_LVL_NOISE
-// APPL_TRACE_LVL_DEBUG
-// APPL_TRACE_LVL_INFO
-// APPL_TRACE_LVL_WARNING
-
+#include "linux_mdio.h"
+#include "main.h"
+appl_inst_t inst;
 // *****************************************************************************
 // *****************************************************************************
 // Section: Function prototypes
 // *****************************************************************************
 // *****************************************************************************
+// Required by MEPA
+// void *mem_alloc(struct mepa_callout_ctx *ctx, size_t size)
+// {
+//     return malloc(size);
+// }
 
-void appl_set_trace(void);
-
-void appl_mepa_tracer(const mepa_trace_data_t *data, va_list args);
-
+// void mem_free(struct mepa_callout_ctx *ctx, void *ptr)
+// {
+//     free(ptr);
+// }
 // *****************************************************************************
 // *****************************************************************************
-// Section: MEPA Structs
+// Section: Global Variables
 // *****************************************************************************
 // *****************************************************************************
 
@@ -73,173 +61,97 @@ void appl_mepa_tracer(const mepa_trace_data_t *data, va_list args);
 // Section: Main Entry Point
 // *****************************************************************************
 // *****************************************************************************
+int main(int argc, char* argv[]) {
 
- int main(void)
- {
-    // Defining local variables
-    mepa_rc rc = 0;
-    unsigned int i = 0;
+    int ret = 0;
+    int test_mode = 1; // For debugging only.
+    mepa_port_no_t port_no = 0;
+    char* mdio_bus = "";
 
-    printf("SAMA7 + lan884x MEPA Sanity Check Code.\r\n");
-    printf("LAN8841 EDS2 PHY Daughterboard is connected to EDS2 Connector\r\n");
-    printf("EDS2 connector is RGMII and uses GMAC1\r\n");
+    // Check Arguments
+    if (argc > 1) {
+        if (strcmp(argv[1],"-h") == 0) {
+            printf("Help File: \r\n");
+            printf("   Options in order: \r\n");
+            printf("       -h                  Show this help \r\n");
+            printf("       -m <mdio-bus>        Open mdio bus \r\n");
+            printf("            Run -m without arguments to see available mdio buses.\r\n");
+            printf("            Make sure to use exact mdio bus name!.\r\n");
+            printf("       -t                  Turn on test_mode \r\n");
+            exit(EXIT_FAILURE);
+        }
+        else if (strcmp(argv[1],"-m") == 0) {
+            if (argc < 3) {
+                printf("No mdio bus given.\r\n");
+                // Do not return failure here. Instead, let mdio_initialize handle it and print the available mdio buses.
+            }
+            else {
+                mdio_bus = argv[2];
+                printf("Using mdio bus: %s\r\n", mdio_bus);
+            }
+        }
+    }
 
-    appl_set_trace();
-
-    // Test the trace functions. You should see an output in the terminal.
-    T_E("Error at %d\r\n", __LINE__);
-    T_D("Debug at %d\r\n", __LINE__);
-    T_W("Warning at %d\r\n", __LINE__);
-    T_I("Info at %d\r\n", __LINE__);
-
-    printf ("//Default Setup Assumptions: \n" );
-    printf ("//Board has Power Applied prior to Demo start \n" );
-    printf ("//Pwr Supply/Voltages Stable, Ref Clk Stable, Ref & PLL Stable \n\n" );
-
-    /* ****************************************************** */
-    /*                       BOARD SETUP                      */
-    /* ****************************************************** */
-    // Initialize the "board" (which refers to the RPi and VSC8258EV setup)
-    // Test the board... or at least read the Device ID
-    printf("%s: Connecting to the lan884x board via mdio... \r\n", __func__);
-    printf("%s: Initializing linux mdio-netlink... \r\n", __func__);
-    appl_mdio_init();
-
-    // Test MDIO; Get PHY Registers, fail if 0xFFFF or 0x0000
-    uint32_t val = 0;
-    // rpi_spi_32bit_read_rbt_test(0x0, 0x1e, 0x0, &val);
-    // printf("In Line %d: Dev ID = 0x%x\r\n\r\n", __LINE__, val);
-
-    return 0;
-}
-
- // *****************************************************************************
-// *****************************************************************************
-// Section: Function Defines
-// *****************************************************************************
-// *****************************************************************************
-
-void appl_set_trace(void)
-{
-    // Register the tracer function
-    MEPA_TRACE_FUNCTION = appl_mepa_tracer;
-}
-
-void appl_mdio_init(void)
-{
-    if (mdio_initialize() != 0) {
-        printf("Failed to initialize mdio-netlink\r\n");
+    if (argc < 1) {
+        printf("Error: Require Arguments. See -h\r\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    if(mdio_initialize(mdio_bus) != 0) {
+        printf("Failed to initialize mdio\r\n");
         exit(EXIT_FAILURE);
     } else {
-        printf("mdio-netlink initialized\r\n");
-    }
-}
-
-void appl_mepa_tracer(const mepa_trace_data_t *data, va_list args)
-{
-    // Taken from the example code snippet in mepa-doc.html#mepa/docs/mepa_instantiation
-#if !defined(APPL_TRACE_LVL_NONE)
-#if !defined(APPL_TRACE_LVL_ERROR)
-#if !defined(APPL_TRACE_LVL_WARNING)
-#if !defined(APPL_TRACE_LVL_INFO)
-#if !defined(APPL_TRACE_LVL_DEBUG)
-#if !defined(APPL_TRACE_LVL_NOISE)
-    #define APPL_TRACE_LVL_NONE
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-
-#ifdef APPL_TRACE_LVL_NONE
-    return;
-#endif
-
-#ifdef APPL_TRACE_LVL_ERROR
-    if(data->level < MEPA_TRACE_LVL_ERROR)
-    {
-        return;
-    }
-#endif
-
-
-#ifdef APPL_TRACE_LVL_WARNING
-    if(data->level < MEPA_TRACE_LVL_WARNING)
-    {
-        return;
-    }
-#endif
-
-#ifdef APPL_TRACE_LVL_INFO
-    if(data->level < MEPA_TRACE_LVL_INFO)
-    {
-        return;
-    }
-#endif
-
-
-#ifdef APPL_TRACE_LVL_DEBUG
-    if(data->level < MEPA_TRACE_LVL_DEBUG)
-    {
-        return;
-    }
-#endif
-
-#ifdef APPL_TRACE_LVL_NOISE
-    if(data->level < MEPA_TRACE_LVL_NOISE)
-    {
-        return;
-    }
-#endif
-
-    // Do filtering, and optionally add more details.
-    printf("%s ", data->location);
-    //vprintf(data->format, args);
-
-    /* Note: for real applications, it may be useful to 
-     * do filtering here such that only certain print levels
-     * show up on the output. For example:
-     *       if(data->level ==  MEPA_TRACE_LVL_DEBUG)
-     * #ifdef (TRACE_LEVEL_DEBUG)
-     *           vprintf(...);
-     * #endif
-     *
-     *  Then, compile the application with the correct flags
-     *  gcc .. -DTRACE_LEVEL_DEBUG -DTRACE_LEVEL_INFO ...
-     *
-     * It's the user's responsibility to use the trace levels
-     * properly in the application.
-    */
-
-    char *trace_str[] = {
-        "null",
-        "RACKET",
-        "NOISE",
-        "null",
-        "DEBUG",
-        "null",
-        "INFO",
-        "null",
-        "WARNING",
-        "ERROR",
-        "NONE"
-    };
-    
-    char tempstr[512];
-    memset(tempstr, 0, sizeof(tempstr));
-
-    printf("(%s): ", trace_str[data->level]);
-    vsprintf(tempstr, data->format, args);
-    printf("%s", tempstr);
-
-    // Check for newline:
-    if(tempstr[strlen(tempstr)-1] != '\n')
-    {
-        printf("\r\n");
+        printf("Successfully initialized mdio_bus!\r\n");
     }
 
-    return;
+    if (test_mode == 1) {
+        printf("Running mdio test code\r\n");
+        mdio_test_code(mdio_bus); 
+    }
+
+    /* MEPA Initialization
+     * Take ./sw-mepa/mepa_demo/mepa_apps/phy_port_config.c as an example.
+     */ 
+    memset(&inst.board_conf, 0, sizeof(inst.board_conf));
+
+    // Create MEPA Devices
+    for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
+
+        // memset(&inst.callout_ctx[port_no], 0, sizeof(inst.callout_ctx[port_no]));
+
+        // //Register Callouts (All of these are required)
+        // memset(&inst.callout[port_no], 0, sizeof(inst.callout[port_no]));
+        // inst.callout[port_no].spi_read = spi_32bit_malibu_read_spidev;
+        // inst.callout[port_no].spi_write = spi_32bit_malibu_write_spidev;
+        // inst.callout[port_no].mem_alloc = mem_alloc;
+        // inst.callout[port_no].mem_free = mem_free;
+        // inst.board_conf.numeric_handle = port_no;
+
+        // Create MEPA device for this port. The MEPA device will be used by the application to call MEPA APIs for this port.
+        // inst.phy[port_no] = mepa_create(&inst.callout[port_no], &inst.callout_ctx[port_no], &inst.board_conf);
+        
+        if (inst.phy[port_no]) {
+            printf("Phy has been probed on port %d\r\n", port_no);
+        }
+        else {
+            printf("Failed to probe PHY, port_no: %d\r\n", port_no);
+            exit(EXIT_FAILURE);
+        }
+
+        // mepa_driver_link_base_port not implemented on Malibu(??)
+    }
+
+    // Attach here sample application
+    printf("Jump to Sample Application.\r\n");
+    if (mepa_app_sample_appl == NULL) {
+        printf("Error: No Sample Application\r\n");
+        exit(EXIT_FAILURE);
+    }
+    else {
+        // Pass all required MEPA instance to sample application.
+        mepa_app_sample_appl(&inst);
+    }
+    exit(EXIT_SUCCESS);
 }
 
 // *****************************************************************************

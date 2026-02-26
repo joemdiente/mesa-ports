@@ -33,21 +33,57 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "sama7_mdio.h"
+#include <dirent.h>
+#include "linux_mdio.h"
 #include "mdio.h"
 #include <linux/mdio.h> // Use for #define PHY register
 
 /* Initialize Variables */
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // MDIO Functions for SAMA7 or Any Linux Machine.
 // This is a copy of wkz/mdio-tools/blob/master/src/mdio/main.c
 ////////////////////////////////////////////////////////////////////////////////
+int list_available_mdio_buses() {
+	DIR *d;
+	struct dirent *dir;
+	d = opendir("/sys/class/mdio_bus");
+	if (d) {
+		while ((dir = readdir(d)) != NULL) {
+			if (dir->d_type == DT_LNK) {
+				printf("--> %s\n", dir->d_name);
+			}
+		}
+		closedir(d);
+		return 0;
+	} else {
+		fprintf(stderr, "ERROR: Unable to open /sys/class/mdio_bus.\r\n");
+		return -1;
+	}
+}
 
-int mdio_initialize(void) {
+int match_available_mdio_bus(char* mdio_bus) {
+	DIR *d;
+	struct dirent *dir;
+	d = opendir("/sys/class/mdio_bus");
+	if (d) {
+		while ((dir = readdir(d)) != NULL) {
+			if (dir->d_type == DT_LNK) {
+				if(strcmp(dir->d_name, mdio_bus) == 0) {
+					printf("Selected mdio bus: %s\n", dir->d_name);
+					return 0;
+				}
+			}
+		}
+		closedir(d);
+		printf("ERROR: mdio bus \"%s\" not found in /sys/class/mdio_bus.\r\n", mdio_bus);
+		return -1;
+	} 
+	printf("ERROR: Unable to open /sys/class/mdio_bus.\r\n");
+	return -1;
+}
+int mdio_initialize(char* mdio_bus) {
 
-    // Not yet building
 	if (mdio_init()) {
 		if (mdio_modprobe()) {
 			fprintf(stderr, "ERROR: mdio-netlink module not "
@@ -61,9 +97,29 @@ int mdio_initialize(void) {
 		}
 	}
 
+	printf("mdio-netlink module loaded or already running.\r\n");
+
+	if (strcmp(mdio_bus, "") == 0) {
+		printf("Available mdio buses: \r\n");
+		list_available_mdio_buses();
+		printf("Please pass one of the above as an \'exact\' argument using -m <mdio_bus>. \r\n");
+		printf("Using wildcard is not supported. \r\n");
+		return -1;
+	} else {
+		if (match_available_mdio_bus(mdio_bus) != 0) {
+			exit(EXIT_FAILURE);
+		}
+	} 
+
 	return 0;
 }
 
+int mdio_test_code(char* mdio_bus, uint8_t phy_id) {
+
+	int i = 0;
+
+	// Get PHY ID
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Wrapper Functions for MEPA
 ////////////////////////////////////////////////////////////////////////////////
