@@ -28,6 +28,7 @@ SOURCE_DIR "${MEPA_DIR}"
 )
 
 # 3. Find libmnl in buildroot SDK
+set(PKG_CONFIG_EXECUTABLE "${CMAKE_PROGRAM_PATH}/pkg-config")
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBMNL REQUIRED libmnl)
 

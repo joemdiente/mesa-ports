@@ -127,7 +127,12 @@ void appl_set_trace(void)
 
 void appl_mdio_init(void)
 {
-    mdio_initialize();
+    if (mdio_initialize() != 0) {
+        printf("Failed to initialize mdio-netlink\r\n");
+        exit(EXIT_FAILURE);
+    } else {
+        printf("mdio-netlink initialized\r\n");
+    }
 }
 
 void appl_mepa_tracer(const mepa_trace_data_t *data, va_list args)

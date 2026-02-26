@@ -16,6 +16,6 @@
 #define T_N(format, ...) MEPA_trace(MEPA_TRACE_GRP_GEN, MEPA_TRACE_LVL_NOISE, __FUNCTION__, __LINE__, __FILE__, format, ##__VA_ARGS__);
 
 // Function prototypes
-void mdio_initialize(void);
+int mdio_initialize(void);
 
 #endif /*_SAMA7_MDIO_H_*/

@@ -45,23 +45,23 @@
 // This is a copy of wkz/mdio-tools/blob/master/src/mdio/main.c
 ////////////////////////////////////////////////////////////////////////////////
 
-void mdio_initialize(void) {
+int mdio_initialize(void) {
 
     // Not yet building
-	// if (mdio_init()) {
-	// 	if (mdio_modprobe()) {
-	// 		fprintf(stderr, "ERROR: mdio-netlink module not "
-	// 			"detected, and could not be loaded.\n");
-	// 		return 1;
-	// 	}
+	if (mdio_init()) {
+		if (mdio_modprobe()) {
+			fprintf(stderr, "ERROR: mdio-netlink module not "
+				"detected, and could not be loaded.\n");
+			return -1;
+		}
 
-	// 	if (mdio_init()) {
-	// 		fprintf(stderr, "ERROR: Unable to initialize.\n");
-	// 		return 1;
-	// 	}
-	// }
-    
+		if (mdio_init()) {
+			fprintf(stderr, "ERROR: Unable to initialize.\n");
+			return -1;
+		}
+	}
 
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
