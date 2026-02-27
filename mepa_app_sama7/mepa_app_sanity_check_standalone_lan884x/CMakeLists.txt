@@ -43,6 +43,8 @@ add_executable(mepa_app_sanity_check_lan884x
 target_include_directories(mepa_app_sanity_check_lan884x PRIVATE 
     ${MEPA_DIR}/mepa/include/
     ${MEPA_DIR}/me/include/
+    ${MEPA_DIR}/board-configs/include/ # All these two for callout
+    ${MEPA_DIR}/sw-mesa/mesa/include/  # All these two for callout
     ${INC_DIR}/
     ${MDIO_TOOLS_DIR}/include/
     ${MDIO_TOOLS_DIR}/src/mdio/

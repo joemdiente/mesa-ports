@@ -41,15 +41,15 @@ appl_inst_t inst;
 // *****************************************************************************
 // *****************************************************************************
 // Required by MEPA
-// void *mem_alloc(struct mepa_callout_ctx *ctx, size_t size)
-// {
-//     return malloc(size);
-// }
+void *mem_alloc(struct mepa_callout_ctx *ctx, size_t size)
+{
+    return malloc(size);
+}
 
-// void mem_free(struct mepa_callout_ctx *ctx, void *ptr)
-// {
-//     free(ptr);
-// }
+void mem_free(struct mepa_callout_ctx *ctx, void *ptr)
+{
+    free(ptr);
+}
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Variables
@@ -64,7 +64,7 @@ appl_inst_t inst;
 int main(int argc, char* argv[]) {
 
     int ret = 0;
-    int test_mode = 1; // For debugging only.
+    int test_mode = 0; // For debugging only.
     mepa_port_no_t port_no = 0;
     char* mdio_bus = "";
     uint8_t phy_id = 0;
@@ -125,18 +125,18 @@ int main(int argc, char* argv[]) {
     // Create MEPA Devices
     for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
 
-        // memset(&inst.callout_ctx[port_no], 0, sizeof(inst.callout_ctx[port_no]));
+        memset(&inst.callout_ctx[port_no], 0, sizeof(inst.callout_ctx[port_no]));
 
-        // //Register Callouts (All of these are required)
-        // memset(&inst.callout[port_no], 0, sizeof(inst.callout[port_no]));
-        // inst.callout[port_no].spi_read = spi_32bit_malibu_read_spidev;
-        // inst.callout[port_no].spi_write = spi_32bit_malibu_write_spidev;
-        // inst.callout[port_no].mem_alloc = mem_alloc;
-        // inst.callout[port_no].mem_free = mem_free;
-        // inst.board_conf.numeric_handle = port_no;
+        //Register Callouts (All of these are required)
+        memset(&inst.callout[port_no], 0, sizeof(inst.callout[port_no]));
+        inst.callout[port_no].miim_read = mdio_read;
+        inst.callout[port_no].miim_write = mdio_write;
+        inst.callout[port_no].mem_alloc = mem_alloc;
+        inst.callout[port_no].mem_free = mem_free;
+        inst.board_conf.numeric_handle = port_no;
 
         // Create MEPA device for this port. The MEPA device will be used by the application to call MEPA APIs for this port.
-        // inst.phy[port_no] = mepa_create(&inst.callout[port_no], &inst.callout_ctx[port_no], &inst.board_conf);
+        inst.phy[port_no] = mepa_create(&inst.callout[port_no], &inst.callout_ctx[port_no], &inst.board_conf);
         
         if (inst.phy[port_no]) {
             printf("Phy has been probed on port %d\r\n", port_no);

@@ -14,6 +14,7 @@
 // *****************************************************************************
 #include <stdint.h>
 #include "microchip/ethernet/phy/api.h"
+#include "microchip/ethernet/board/api.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: Macros and Constant defines
@@ -27,8 +28,8 @@
 // *****************************************************************************
 
 typedef struct {
-    // mepa_callout_t callout[LAN884X_PORT_COUNT];
-    // mepa_callout_ctx_t callout_ctx[LAN884X_PORT_COUNT];
+    mepa_callout_t callout[LAN884X_PORT_COUNT];
+    mepa_callout_ctx_t callout_ctx[LAN884X_PORT_COUNT];
     mepa_board_conf_t board_conf;
     mepa_device_t *phy[LAN884X_PORT_COUNT];
     mepa_conf_t malibu_conf;

@@ -52,6 +52,11 @@ static volatile int callback_err = 0;
 /* Store PHY Register Value */
 static volatile uint16_t phy_reg_val = 0;
 
+typedef struct {
+	int cb_done;
+	int cb_err;
+	uint16_t value;
+} mdio_ops_t;
 ////////////////////////////////////////////////////////////////////////////////
 // MDIO Functions for SAMA7 or Any Linux Machine.
 // This is a copy of wkz/mdio-tools/blob/master/src/mdio/main.c
@@ -138,7 +143,44 @@ int mdio_initialize(char* mdio_bus, uint8_t* phy_id) {
 ////////////////////////////////////////////////////////////////////////////////
 // Wrapper Functions for MEPA
 ////////////////////////////////////////////////////////////////////////////////
+int mdio_read_cb(uint32_t *data, int len, int err, void *arg)
+{
+	mdio_ops_t* cb_ops = (struct mdio_ops_t*)arg;
+	cb_ops->cb_done = 1;
+	printf("mdio_read_cb called\r\n");
+	return 0;
+}
+uint8_t mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value) {
+	mdio_ops_t mdio_op = {};
+	int err = 0;
+	printf("mdio_read called\r\n");
+	/* Create instructions */
+	struct mdio_nl_insn insns[] = {
+		INSN(READ,  IMM(_phy_id), IMM(addr),  REG(0)),  /* PHY register 2 */
+		INSN(EMIT,  REG(0),      0,       0),        /* Emit register 2 value */
+	};
 
+	/* Create program from instructions */
+	struct mdio_prog prog = MDIO_PROG_FIXED(insns);
+
+	/* Execute the program and call callback with results */
+	err = mdio_xfer(_mdio_bus, &prog, mdio_read_cb, &mdio_op); // read_phy_regs_cb was writen by AI.
+
+	while(mdio_op.cb_done != 1);
+
+	if (err) {
+		fprintf(stderr, "ERROR: Failed to execute mdio_xfer (%d)\n", err);
+		return 1;
+	}
+	return 0;
+}
+int mdio_write_cb(uint32_t *data, int len, int err, void *arg)
+{
+	return 0;
+}
+uint8_t mdio_write (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t value) {
+	return 0;
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Test Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +236,7 @@ static int read_reg_cb_test3(uint32_t *data, int len, int err, void *arg)
 		return 1;
 	}
 	printf("	[cb]PHY register 14 value: 0x%04X\r\n", data[0]);
+	phy_reg_val = data[0];
 	callback_done = 1;
 	return err;
 }
@@ -402,8 +445,9 @@ int mdio_test_code(void) {
 	/* Create program from instructions */
 	memset(&prog_test3, 0, sizeof(prog_test3));
 	prog_test3 = MDIO_PROG_FIXED(read_insns_test3);
-	
-	err = mdio_xfer(_mdio_bus, &prog_test3, read_reg_cb_test3, &phy_reg_val); // Note: 4th parameter can be used to get data from cb to this app.
+
+	// Note: 4th parameter can be used to get data from cb to this app. But data is currently global.
+	err = mdio_xfer(_mdio_bus, &prog_test3, read_reg_cb_test3, NULL); 
 
 	while(callback_done != 1);
 
@@ -415,11 +459,11 @@ int mdio_test_code(void) {
 		fprintf(stderr, "ERROR: Verify operation failed\n");
 		return -1;
 	}
-	printf("phy_reg_val: 0x%04X\r\n",phy_reg_val);
+
 	if (phy_reg_val != 0xAA55) {
 		printf("	Verified failed!\r\n");
 	} else {
-		printf("	Verified Success. read_val == 0xAA55\r\n");
+		printf("	Verified Success. read_val == 0x%04X\r\n", phy_reg_val);
 	}
 
 	// Clear PHY Registers 14
