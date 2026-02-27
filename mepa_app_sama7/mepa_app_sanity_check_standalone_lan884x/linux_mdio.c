@@ -147,13 +147,14 @@ int mdio_read_cb(uint32_t *data, int len, int err, void *arg)
 {
 	mdio_ops_t* cb_ops = (struct mdio_ops_t*)arg;
 	cb_ops->cb_done = 1;
-	printf("mdio_read_cb called\r\n");
+	cb_ops->cb_err = err;
+	cb_ops->value = data[0];
 	return 0;
 }
 uint8_t mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value) {
 	mdio_ops_t mdio_op = {};
 	int err = 0;
-	printf("mdio_read called\r\n");
+
 	/* Create instructions */
 	struct mdio_nl_insn insns[] = {
 		INSN(READ,  IMM(_phy_id), IMM(addr),  REG(0)),  /* PHY register 2 */
@@ -172,14 +173,43 @@ uint8_t mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value) 
 		fprintf(stderr, "ERROR: Failed to execute mdio_xfer (%d)\n", err);
 		return 1;
 	}
+	value = mdio_op.value;
 	return 0;
 }
 int mdio_write_cb(uint32_t *data, int len, int err, void *arg)
 {
+	mdio_ops_t* cb_ops = (struct mdio_ops_t*)arg;
+	cb_ops->cb_done = 1;
+	cb_ops->cb_err = err;
+	printf("mdio_write_cb called\r\n");
 	return 0;
 }
 uint8_t mdio_write (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t value) {
-	return 0;
+	mdio_ops_t mdio_op = {};
+	int err = 0;
+
+	printf("mdio_write called\r\n");
+	/* Create instructions */
+	struct mdio_nl_insn insns[] = {
+		INSN(WRITE, IMM(_phy_id), IMM(addr), IMM(value)),
+	};
+
+	/* Create program from instructions */
+	struct mdio_prog prog = MDIO_PROG_FIXED(insns);
+
+	/* Execute the program and call callback with results */
+	err = mdio_xfer(_mdio_bus, &prog, mdio_write_cb, &mdio_op); // read_phy_regs_cb was writen by AI.
+
+	while(callback_done != 1);
+
+	if (err) {
+		fprintf(stderr, "	ERROR: mdio_xfer failed (%d)\n", err);
+		return -1;
+	}
+	if (callback_err) {
+		fprintf(stderr, "	ERROR: Write operation failed\n");
+		return -1;
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Test Functions

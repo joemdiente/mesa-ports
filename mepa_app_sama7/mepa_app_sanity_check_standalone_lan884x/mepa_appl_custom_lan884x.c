@@ -149,16 +149,101 @@ int main(int argc, char* argv[]) {
         // mepa_driver_link_base_port not implemented on Malibu(??)
     }
 
-    // Attach here sample application
-    printf("Jump to Sample Application.\r\n");
-    if (mepa_app_sample_appl == NULL) {
-        printf("Error: No Sample Application\r\n");
-        exit(EXIT_FAILURE);
+    // 1. Simple - Reset PHY
+    printf("\r\n MEPA Reset all PHYs\r\n");
+    mepa_reset_param_t rst_conf = {};
+    rst_conf.reset_point = MEPA_RESET_POINT_PRE;
+    
+    for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
+        // Reset PHY ports
+        ret = mepa_reset(inst.phy[port_no], &rst_conf);
+        if (ret) {
+            printf("Failed to reset PHY, port_no: %d\r\n", port_no);
+            return ret;
+        }
+        else {
+            printf("PHY Reset Success, port_no: %d\r\n", port_no);
+        }
     }
-    else {
-        // Pass all required MEPA instance to sample application.
-        mepa_app_sample_appl(&inst);
+
+    // 2. Register Read/Write from MEPA
+    printf("\r\n MEPA Register Read Only\r\n");
+    port_no = 0;
+    uint32_t value = 0;
+    inst.callout[port_no].miim_read(NULL, 0x2, &value);
+    printf("PHY Register 2: 0x%04X\n", value);
+
+    // 3. PHY Information Details
+    printf("\r\n MEPA Get PHY Information Details\r\n");
+    mepa_phy_info_t phy_info = {};
+
+    for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
+        if (mepa_phy_info_get(inst.phy[port_no], &phy_info) == 0) {
+            printf("Port No: %d ; Part Number: 0x%X; Revision: 0x%X\r\n", 
+                port_no, phy_info.part_number, phy_info.revision);
+        } else {
+            printf("Failed to get PHY information details\r\n");
+        }
     }
+
+    // 3. Simple - Configure PHY Operating Mode - Set to 10G Only
+    printf("\r\n MEPA Port Configuration\r\n");
+    mepa_conf_t conf;
+    // Conf Get
+    for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
+        if (mepa_conf_get(inst.phy[port_no], &conf) < 0) {
+            printf("Failed to get current port configuration for port %d\r\n", port_no);
+        }
+    }
+
+    for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
+
+        // PHY Configuration
+        conf.speed = MESA_SPEED_1G;
+        conf.fdx = true;
+        conf.flow_control = true;
+        conf.aneg.speed_1g_fdx = true;
+
+        if (mepa_conf_set(inst.phy[port_no], &conf) == 0) {
+            printf("Port %d configuration success.\r\n", port_no);
+        } else {
+             printf("Port %d configuration failed.\r\n", port_no);
+        }
+    }
+
+    // 4. Simple - Poll PHY Link Status
+    printf("\r\n MEPA Poll PHY link status\r\n");
+    mepa_status_t status = {};
+    // See microchip/ethernet/common.h > mesa_port_speed_t
+    char *portspeed2txt[] = {
+        "Undefined",
+        "10 Mbps",
+        "100 Mbps",
+        "1000 Mbps",
+        "2500 Mbps",
+        "5 Gbps",
+        "10 Gbps",
+        "12 Gbps",
+        "25 Gbps",
+        "Auto",
+    };
+
+    while(1) {
+        printf("\033[2J\033[H");
+        printf(" MEPA Poll Link Information per Port \r\n");
+        for (port_no = 0; port_no < LAN884X_PORT_COUNT; port_no++) {
+            if (mepa_poll(inst.phy[port_no], &status) == 0) {
+                printf("Port: %d, Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", port_no, portspeed2txt[status.speed], \
+                status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
+            } else {
+                printf("Port %d poll failed.\r\n", port_no);
+            }
+        }
+        fflush(stdout);
+        sleep(1);
+    }
+
+    return ret;
     exit(EXIT_SUCCESS);
 }
 
