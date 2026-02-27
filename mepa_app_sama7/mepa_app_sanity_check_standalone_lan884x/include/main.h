@@ -20,7 +20,7 @@
 // Section: Macros and Constant defines
 // *****************************************************************************
 // *****************************************************************************
-#define LAN884X_PORT_COUNT 1
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: MEPA Structs
@@ -28,11 +28,10 @@
 // *****************************************************************************
 
 typedef struct {
-    mepa_callout_t callout[LAN884X_PORT_COUNT];
-    mepa_callout_ctx_t callout_ctx[LAN884X_PORT_COUNT];
+    mepa_callout_t callout;
+    mepa_callout_ctx_t callout_ctx;
     mepa_board_conf_t board_conf;
-    mepa_device_t *phy[LAN884X_PORT_COUNT];
-    mepa_conf_t malibu_conf;
+    mepa_device_t *phy;
 } appl_inst_t;
 // *****************************************************************************
 // *****************************************************************************
