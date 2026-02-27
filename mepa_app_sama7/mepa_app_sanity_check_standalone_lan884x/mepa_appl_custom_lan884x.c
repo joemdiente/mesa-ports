@@ -67,14 +67,15 @@ int main(int argc, char* argv[]) {
     int test_mode = 1; // For debugging only.
     mepa_port_no_t port_no = 0;
     char* mdio_bus = "";
+    uint8_t phy_id = 0;
 
     // Check Arguments
     if (argc > 1) {
         if (strcmp(argv[1],"-h") == 0) {
             printf("Help File: \r\n");
             printf("   Options in order: \r\n");
-            printf("       -h                  Show this help \r\n");
-            printf("       -m <mdio-bus>        Open mdio bus \r\n");
+            printf("       -h                       Show this help \r\n");
+            printf("       -m <mdio-bus> <phy_id>   Open mdio bus \r\n");
             printf("            Run -m without arguments to see available mdio buses.\r\n");
             printf("            Make sure to use exact mdio bus name!.\r\n");
             printf("       -t                  Turn on test_mode \r\n");
@@ -88,6 +89,14 @@ int main(int argc, char* argv[]) {
             else {
                 mdio_bus = argv[2];
                 printf("Using mdio bus: %s\r\n", mdio_bus);
+                if (argc < 4) {
+                    printf("No phy_id. Using default phy_id 0.\r\n");
+                    phy_id = 0;
+                } else {
+                    // Just convert here to int. phy_id is checked in linux_mdio.c
+                    uint8_t x = atoi(argv[3]);
+                    phy_id = x;
+                }
             }
         }
     }
@@ -97,7 +106,7 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
     
-    if(mdio_initialize(mdio_bus) != 0) {
+    if(mdio_initialize(mdio_bus, &phy_id) != 0) {
         printf("Failed to initialize mdio\r\n");
         exit(EXIT_FAILURE);
     } else {
@@ -105,8 +114,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (test_mode == 1) {
-        printf("Running mdio test code\r\n");
-        mdio_test_code(mdio_bus); 
+        mdio_test_code(); 
     }
 
     /* MEPA Initialization
