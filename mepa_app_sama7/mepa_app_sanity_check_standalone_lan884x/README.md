@@ -4,6 +4,7 @@
     - Uses MDIO-NETLINK (https://github.com/wkz/mdio-tools) for MDIO BUS Access. 
     - MEPA code was  referenced from repository https://github.com/MicrochipTech/mepa_app_malibu10_rpi.
 - This is used as a starting point when developing own application. Used for sanity checking, example code includes simple IO test, simple mepa init, and basic port information.
+- Note: This is not a production code! If there are any changes, you are on your own.
 
 ### CMAKE FLAGS:
 
@@ -48,9 +49,4 @@
 ````
 
 ### Expected Output
-
-````
-$ ./mepa_app_sanity_check
-
-
-````
+- See docs/app_log.txt
