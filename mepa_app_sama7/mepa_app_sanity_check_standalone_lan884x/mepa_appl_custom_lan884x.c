@@ -68,6 +68,20 @@ int main(int argc, char* argv[]) {
     int test_mode = 0; // For debugging only.
     char* mdio_bus = "";
     uint8_t phy_id = 0;
+ 
+    // See microchip/ethernet/common.h > mesa_port_speed_t
+    char *portspeed2txt[] = {
+        "Undefined",
+        "10 Mbps",
+        "100 Mbps",
+        "1000 Mbps",
+        "2500 Mbps",
+        "5 Gbps",
+        "10 Gbps",
+        "12 Gbps",
+        "25 Gbps",
+        "Auto",
+    };
 
     // Check Arguments
     if (argc > 1) {
@@ -127,8 +141,8 @@ int main(int argc, char* argv[]) {
 
     //Register Callouts (All of these are required)
     memset(&inst.callout, 0, sizeof(inst.callout));
-    inst.callout.miim_read = (mepa_miim_read_t)mdio_read;
-    inst.callout.miim_write = (mepa_miim_write_t)mdio_write;
+    inst.callout.miim_read = mdio_read;
+    inst.callout.miim_write = mdio_write;
     inst.callout.mem_alloc = mem_alloc;
     inst.callout.mem_free = mem_free;
     inst.board_conf.numeric_handle = 0;
@@ -148,7 +162,7 @@ int main(int argc, char* argv[]) {
     printf("\r\nMEPA Reset all PHYs\r\n");
     mepa_reset_param_t rst_conf = {};
     rst_conf.reset_point = MEPA_RESET_POINT_PRE;
-    
+    rst_conf.media_intf = MESA_PHY_MEDIA_IF_CU;
     // Reset PHY
     ret = mepa_reset(inst.phy, &rst_conf);
     if (ret) {
@@ -159,11 +173,24 @@ int main(int argc, char* argv[]) {
         printf(" PHY Reset Success.\r\n");
     }
 
-    // 2. Register Read from MEPA
-    printf("\r\nMEPA Register Read Only\r\n");
+    // 2. Register Read/Write from MEPA
+    printf("\r\nMEPA Register Read/Write Only\r\n");
     uint32_t value = 0;
+
+    // Read
     inst.callout.miim_read(NULL, 0x2, &value);
     printf(" PHY Register 2: 0x%04X\n", value);
+    inst.callout.miim_read(NULL, 0x3, &value);
+    printf(" PHY Register 3: 0x%04X\n", value);
+    // Write
+    printf(" Writing 0xABCD to PHY register 22...\n"); // LED Registers
+    value = 0xABCD;
+    inst.callout.miim_write(NULL, 22, value);
+    inst.callout.miim_read(NULL, 22, &value);
+    printf(" Read PHY register 22: 0x%04X\n", value);
+    value = 0x8021;
+    printf(" Reset PHY Register 22: 0x%04X\n", value);
+    inst.callout.miim_write(NULL, 22, value);
 
     // 3. PHY Information Details
     printf("\r\nMEPA Get PHY Information Details\r\n");
@@ -184,12 +211,10 @@ int main(int argc, char* argv[]) {
     if (mepa_conf_get(inst.phy, &conf) < 0) {
         printf(" Failed to get current PHY configuration\r\n");
     }
-
+      
     // PHY Configuration
-    conf.speed = MESA_SPEED_1G;
-    conf.fdx = true;
-    conf.flow_control = true;
-    conf.aneg.speed_1g_fdx = true;
+    conf.speed = MEPA_SPEED_AUTO; // Auto-negotiation.
+    conf.admin.enable = 1; // Enable port. This is required for link to come up.
 
     if (mepa_conf_set(inst.phy, &conf) == 0) {
         printf(" PHY configuration success.\r\n");
@@ -200,32 +225,12 @@ int main(int argc, char* argv[]) {
     // 4. Simple - Poll PHY Link Status
     printf("\r\nMEPA Poll PHY link status\r\n");
     mepa_status_t status = {};
-    // See microchip/ethernet/common.h > mesa_port_speed_t
-    char *portspeed2txt[] = {
-        "Undefined",
-        "10 Mbps",
-        "100 Mbps",
-        "1000 Mbps",
-        "2500 Mbps",
-        "5 Gbps",
-        "10 Gbps",
-        "12 Gbps",
-        "25 Gbps",
-        "Auto",
-    };
-    int i = 0;
-    printf("Init done. Polling link status every second in..");
-    for (i = 1; i <= 10; i++) {
-        printf("%d..", i);
-        sleep(1);
-    }
 
     while(1) {
-        printf("\033[2J\033[H");
         printf("MEPA Poll Link Information per Port \r\n");
         if (mepa_poll(inst.phy, &status) == 0) {
-            printf(" Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", portspeed2txt[status.speed], \
-            status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
+            printf(" Speed: %s, fdx: %s, Link: %s\n", portspeed2txt[status.speed], \
+            status.fdx? "Yes":"No", status.link? "Up" : "Down");
         } else {
             printf(" poll failed.\r\n");
         }

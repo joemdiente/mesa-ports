@@ -151,7 +151,7 @@ int mdio_read_cb(uint32_t *data, int len, int err, void *arg)
 	cb_ops->value = data[0];
 	return 0;
 }
-uint8_t mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value) {
+mepa_rc mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value) {
 	mdio_ops_t mdio_op = {};
 	int err = 0;
 
@@ -183,7 +183,7 @@ int mdio_write_cb(uint32_t *data, int len, int err, void *arg)
 	cb_ops->cb_err = err;
 	return 0;
 }
-uint8_t mdio_write (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t value) {
+mepa_rc mdio_write (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t value) {
 	mdio_ops_t mdio_op = {};
 	int err = 0;
 

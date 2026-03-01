@@ -18,7 +18,7 @@
 // Function prototypes
 int mdio_initialize(char* mdio_bus, uint8_t* phy_id);
 int mdio_test_code(void);
-uint8_t mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value);
-uint8_t mdio_write (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t value);
+mepa_rc mdio_read (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t *value);
+mepa_rc mdio_write (struct mepa_callout_ctx *ctx, uint8_t addr, uint16_t value);
 
 #endif /*_SAMA7_MDIO_H_*/
