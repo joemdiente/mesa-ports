@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2025 Microchip Technology Inc.
  *
- * Author: MJ Neri https://support.microchip.com
+ * Author: Joemel John A. Diente <JoemelJohn.Diente@microchip.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -17,10 +17,10 @@
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * with this program; If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
 
 // *****************************************************************************
 // *****************************************************************************
