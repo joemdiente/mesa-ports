@@ -214,6 +214,13 @@ int main(int argc, char* argv[]) {
     // PHY Configuration
     conf.speed = MEPA_SPEED_AUTO; // Auto-negotiation.
     conf.admin.enable = 1; // Enable port. This is required for link to come up.
+    // Advertise these speeds.
+    conf.aneg.speed_1g_fdx = true;
+    conf.aneg.speed_1g_hdx = true;
+    conf.aneg.speed_100m_fdx = true;
+    conf.aneg.speed_100m_hdx = true;
+    conf.aneg.speed_10m_fdx = true;
+    conf.aneg.speed_10m_hdx = true;
 
     if (mepa_conf_set(inst.phy, &conf) == 0) {
         printf(" PHY configuration success.\r\n");
