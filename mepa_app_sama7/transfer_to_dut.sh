@@ -14,6 +14,16 @@ if [ "$1" = "clear-keys" ];
         echo "\r\n"
 fi
 
+if [ "$1" = "show-pub" ];
+    then
+        echo "Showing public keys in ~/.ssh/*.pub.."
+        echo "========================================================================================"
+        cat ~/.ssh/*.pub
+        echo "========================================================================================"
+        echo "Copy keys above to target's ~/.ssh/authorized_keys file to enable passwordless ssh and scp"
+        echo "\r\n"
+        exit 1
+fi
 #transfer files to DUT
 echo "Transfer all ./mepa_app* to $DUT_IP....\r\n"
 scp ./mepa_app* root@$DUT_IP:~/
