@@ -49,12 +49,21 @@ foreach(VAR ${sample_applications})
     if(NOT "${VAR}" STREQUAL "mepa_app_main_entry")
         message(STATUS "Building ${VAR}")
 
-        add_executable(${VAR}
-            ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-            ${CMAKE_CURRENT_SOURCE_DIR}/linux_spidev.c 
-            ${CMAKE_CURRENT_SOURCE_DIR}/${VAR}/${VAR}.c
-        )
-
+        if( "${VAR}" STREQUAL "mepa_app_port_linkup")
+            add_executable(${VAR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/linux_spidev.c 
+                ${CMAKE_CURRENT_SOURCE_DIR}/${VAR}/${VAR}.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/${VAR}/aux_func.c
+            )
+        else() 
+            add_executable(${VAR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/main.c
+                ${CMAKE_CURRENT_SOURCE_DIR}/linux_spidev.c 
+                ${CMAKE_CURRENT_SOURCE_DIR}/${VAR}/${VAR}.c
+            )
+        endif()
+        
         # Include Directories
         target_include_directories(${VAR} PRIVATE
             ${MEPA_MAIN_ENTRY_INC}/

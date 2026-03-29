@@ -20,8 +20,8 @@
  */
 
 /*
- * Template Test
- * Make sure to add documentation in this simple app.
+ * mesa_app_port_linkup
+ * demonstrates how to link up a 1G SFP.
  * 
  */
 // *****************************************************************************
@@ -36,145 +36,8 @@
 #include "my_debug.h"
 #include <stdbool.h>
 
-// Create a "wrapper" for 10G GPIOs.
-#include <vtss_phy_10g_api.h>
-#include <vtss_phy_api.h>
-typedef vtss_gpio_10g_gpio_mode_t mepa_gpio_malibu_10g_gpio_mode_t;
-typedef vtss_gpio_10g_no_t mepa_gpio_malibu_10g_no_t;
-
-mepa_rc mepa_malibu_10g_gpio_mode_set(appl_inst_t* inst, mepa_port_no_t port_no, mepa_gpio_malibu_10g_no_t gpio_no, mepa_gpio_malibu_10g_gpio_mode_t* mode) {
-
-    return (mepa_rc)vtss_phy_10g_gpio_mode_set((vtss_inst_t)inst, (vtss_port_no_t)port_no, (vtss_gpio_10g_no_t)gpio_no, (vtss_gpio_10g_gpio_mode_t*) &mode);
-}
-
-/*
- * Note: This function is only compatible with Malibu PHYs.
- */
-int configure_malibu_gpios(appl_inst_t *inst, uint32_t dev_id)
-{
-    // Verify that the connected PHY is indeed a Malibu before proceeding with GPIO configuration
-    if (dev_id != 0x00008258) {
-        printf("Device ID is not Malibu. Aborting GPIO configuration.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    mepa_port_no_t port_no = 0;
-    uint16_t gpio_no = 0;
-    mepa_bool_t value = 0;
-    mepa_gpio_malibu_10g_gpio_mode_t gpio_mode;
-    /* ********************************************************** */
-    // Below note was taken from vtss_appl_10g_phy_malibu.c
-    // GPIO Output functionality
-    // GPIO_0 -> GPIO_7  This repeats for each of the 4 ports.
-    // In this Example:
-    // 0 = GPIO output 0 from channel 0   - CH0_RS0
-    // 1 = GPIO output 1 from channel 0   - N/A
-    // 2 = GPIO output 2 from channel 0   - CH0_SCL - I2C Master for SFP+
-    // 3 = GPIO output 3 from channel 0   - CH0_SDA - I2C Master for SFP+
-    // 4 = GPIO output 4 from channel 0   - CH0_TX_DIS
-    // 5 = GPIO output 5 from channel 0   - N/A
-    // 6 = GPIO output 6 from channel 0   - N/A
-    // 7 = GPIO output 7 from channel 0   - CH0_LINK_UP
-    //
-    // 8 = GPIO output 0 from channel 1   - CH1_RS0
-    // 9 = GPIO output 1 from channel 1   - N/A
-    // 10 = GPIO output 2 from channel 1  - CH1_SCL - I2C Master for SFP+
-    // 11 = GPIO output 3 from channel 1  - CH1_SDA - I2C Master for SFP+
-    // 12 = GPIO output 4 from channel 1  - CH1_TX_DIS
-    // 13 = GPIO output 5 from channel 1  - N/A
-    // 14 = GPIO output 6 from channel 1  - N/A
-    // 15 = GPIO output 7 from channel 1  - CH1_LINK_UP
-    // .....
-    /* ********************************************************** */
-    
-    // GPIO used: #0 for Ch0 (CH0_RS0), #8 for Ch1 and so on
-    printf(" Drive RS0 pins High\r\n");
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 0 + (port_no * 8);
-        if (mepa_gpio_out_set(inst->phy[port_no], gpio_no, 1) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    // GPIO used: #4 for Ch0 (CH0_TX_DIS), #12 for Ch1 and so on
-    printf(" Drive TX_DIS pins Low\r\n");
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 4 + (port_no * 8);
-        if (mepa_gpio_out_set(inst->phy[port_no], gpio_no, 0) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    // GPIO used: #6 (CH0_RXLOS), #14 (CH1_RXLOS) and so on
-    printf(" Check RX_LOS pins \r\n");
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 6 + (port_no * 8);
-        if (mepa_gpio_in_get(inst->phy[port_no], gpio_no, &value) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d: value = %d\r\n", gpio_no, port_no, value);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    // GPIO used: #1 (Ch0_MOD_ABS), #9 (Ch1_MOD_ABS) and so on
-    printf(" Check MOD_ABS pins \r\n");
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 1 + (port_no * 8);
-        if (mepa_gpio_in_get(inst->phy[port_no], gpio_no, &value) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d: value = %d\r\n", gpio_no, port_no, value);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    // GPIO used: #5 (Ch0_TX_FAULT), #13 (Ch1_TX_FAULT) and so on
-    printf(" Check TX_FAULT pins \r\n");
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 5 + (port_no * 8);
-        if (mepa_gpio_in_get(inst->phy[port_no], gpio_no, &value) == 0) {
-            printf("PHY GPIO %d configured successfully for port %d: value = %d\r\n", gpio_no, port_no, value);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    // I2C Configure SCL and SDA pins
-    // GPIO used: #2/#3 (Ch0_SCL and CH0_SDA resp), #10/#11 (Ch1_SCL and CH1_SDA resp) and so on
-
-    printf(" Drive I2C SDA pins \r\n");
-    gpio_mode.mode = VTSS_10G_PHY_GPIO_OUT;
-    gpio_mode.p_gpio = 0;
-    gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_DATA_OUT;
-
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 2 + (port_no * 8);
-        if (mepa_gpio_out_set(inst->phy[port_no], gpio_no, 1) == 0) {
-            printf("I2C Data GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    printf(" Configure I2C SCL pins \r\n");
-    gpio_mode.mode = VTSS_10G_PHY_GPIO_OUT;
-    gpio_mode.p_gpio = 0;
-    gpio_mode.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_CLK_OUT;
-
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        gpio_no = 3 + (port_no * 8);
-         if (mepa_gpio_out_set(inst->phy[port_no], gpio_no, 1) == 0) {
-            printf("I2C Clock GPIO %d configured successfully for port %d\r\n", gpio_no, port_no);
-        } else {
-            printf("Failed to configure PHY GPIO %d for port %d\r\n", gpio_no, port_no);
-        }
-    }
-
-    return 0;
-}
+// Use code from aux-func.c to keep this file clean.
+extern __attribute__((weak)) mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
 
 /*
  * This is the main function for the MEPA application sample.
@@ -210,13 +73,20 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     printf("DEV_ID: 0x%08x\n", dev_id);
 
     // 3. Control 1G CuSFP GPIOs
-    printf("\r\n MEPA Configure GPIOs\r\n");
-    uint32_t value = 0;
-    configure_malibu_gpios(inst, dev_id); // See code above. Pass Device ID.
+    // References:
+    //      mesa/phy_demo_appl/appl/vtss_appl_10g_phy_malibu.c
+    //      mesa/meba/src/sparx5/meba.c > malibu_gpio_map
+    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
+        printf("Configuring GPIOs for port %d\n", port_no);
+        ret = appl_malibu_gpio_conf(inst, port_no);
+        printf("appl_malibu_gpio_conf: rc: %d\n\n", ret);
+    }
     
-    // mepa_i2c_clk_select_t i2c_clk = MEPA_I2C_CLK_SEL_2;
-    // mepa_i2c_clock_select(inst->phy, &i2c_clk); // Set I2C clock to 800 KHz for faster transactions with SFP+
-    
+    // Check PHY capability of Port 0
+    mepa_phy_info_t appl_phy_info;
+    memset(&appl_phy_info, 0, sizeof(appl_phy_info));
+    uint16_t value = 0;
+
     while (1) {
         printf(" Insert 1G CuSFP on P2 (Channel 3)\r\n");
         for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
