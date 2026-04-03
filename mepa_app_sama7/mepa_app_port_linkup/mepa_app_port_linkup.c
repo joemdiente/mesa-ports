@@ -72,38 +72,7 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     inst->callout[port_no].spi_read(NULL, port_no, 0x1E, 0x00, &dev_id);
     printf("DEV_ID: 0x%08x\n", dev_id);
 
-    // 3. Control 1G CuSFP GPIOs
-    // References:
-    //      mesa/phy_demo_appl/appl/vtss_appl_10g_phy_malibu.c
-    //      mesa/meba/src/sparx5/meba.c > malibu_gpio_map
-    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        printf("Configuring GPIOs for port %d\n", port_no);
-        ret = appl_malibu_gpio_conf(inst, port_no);
-        printf("appl_malibu_gpio_conf: rc: %d\n\n", ret);
-    }
-    
-    // Check PHY capability of Port 0
-    mepa_phy_info_t appl_phy_info;
-    memset(&appl_phy_info, 0, sizeof(appl_phy_info));
-    uint16_t value = 0;
-
-    while (1) {
-        printf(" Insert 1G CuSFP on P2 (Channel 3)\r\n");
-        for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-            mepa_i2c_read(inst->phy[port_no], NULL, 0x2, NULL, NULL, 1, &value);
-            printf("Port:%d SFP+ Address 0xA0: 0x%08x\n", port_no, value);
-        }
-        if ((value) != 0) {
-            printf("1G CuSFP detected on P2 (Channel 3)\r\n");
-            break;
-        } else {
-            printf("No SFP+ detected on P2 (Channel 3). Please insert the SFP+ and try again.\r\n");
-        }
-        // Wait for 5 seconds before proceeding to the next step
-        sleep(5);
-    }
-
-    // 4. Simple - Configure PHY Operating Mode - Set to 1G for CuSFP.
+    // 3. Simple - Configure PHY Operating Mode - Set to 1G for CuSFP.
     printf("\r\n MEPA Port Configuration\r\n");
     mepa_conf_t conf;
     // Conf Get
@@ -139,6 +108,19 @@ int mepa_app_sample_appl(appl_inst_t *inst)
              printf("Port %d configuration failed.\r\n", port_no);
         }
     }
+
+    // 4. Control 1G CuSFP GPIOs    
+    /*
+     * #3 Configure PHY Operating Mode should run first before 
+     * configuring GPIO (or I2C) else, gpio or i2c will NOT work.
+     * eg, i2c read will always return 0x00. 
+     */ 
+    for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
+        printf("Configuring GPIOs for port %d\n", port_no);
+        ret = appl_malibu_gpio_conf(inst, port_no);
+        printf("appl_malibu_gpio_conf: rc: %d\n\n", ret);
+    }
+    exit(EXIT_SUCCESS);
 
     // 5. Check Link Status
 
