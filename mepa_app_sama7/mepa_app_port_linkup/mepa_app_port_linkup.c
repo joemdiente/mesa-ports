@@ -37,8 +37,8 @@
 #include <stdbool.h>
 
 // Use code from aux-func.c to keep this file clean.
-extern __attribute__((weak)) mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
-
+extern __attribute__((weak)) mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
+extern __attribute__((weak)) mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
 /*
  * This is the main function for the MEPA application sample.
  */
@@ -82,7 +82,7 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         }
         
         // PHY Configuration
-        conf.speed = MESA_SPEED_10G;
+        conf.speed = MESA_SPEED_1G;
         conf.conf_10g.oper_mode = MEPA_PHY_LAN_MODE;
         conf.conf_10g.interface_mode = MEPA_PHY_SFI_XFI;
         conf.conf_10g.channel_id = MEPA_CHANNELID_NONE;
@@ -95,9 +95,14 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         conf.conf_10g.lref_for_host = false;
         conf.conf_10g.h_clk_src_is_high_amp = true;
         conf.conf_10g.l_clk_src_is_high_amp = true;
-        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_DAC;
-        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_DAC;
+        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_SR2_SC;
+        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_SR2_SC;
         conf.conf_10g.channel_high_to_low = false;
+
+        // 1G Control
+        conf.mac_if_aneg_ena = false; // Disable MAC Aneg.
+        conf.adv_dis = true; // Disable PHY Aneg Advertisement to force speed.
+        conf.admin.enable = true;
 
         if (mepa_conf_set(inst->phy[port_no], &conf) == 0) {
             printf("Port %d configuration success.\r\n", port_no);
@@ -114,7 +119,7 @@ int mepa_app_sample_appl(appl_inst_t *inst)
      */ 
     printf("\r\n MEPA GPIO and I2C Configuration\r\n");
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-        printf("Port %d gpio configuration %s\r\n", port_no, appl_malibu_gpio_conf(inst, port_no)? "failed" : "success");
+        printf("Port %d gpio configuration %s\r\n", port_no, aux_malibu_gpio_conf(inst, port_no)? "failed" : "success");
     }
 
     // 5. Wait for 1G CU SFP Insertion.
@@ -139,7 +144,49 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     }
     
     // 6. Monitor Link Status and Print it.
+    printf("\r\n MEPA Poll PHY link status\r\n");
+    mepa_status_t status = {};
+    // See microchip/ethernet/common.h > mesa_port_speed_t
+    char *portspeed2txt[] = {
+        "Undefined",
+        "10 Mbps",
+        "100 Mbps",
+        "1000 Mbps",
+        "2500 Mbps",
+        "5 Gbps",
+        "10 Gbps",
+        "12 Gbps",
+        "25 Gbps",
+        "Auto",
+    };
 
+    while(1) {
+        // printf("\033[2J\033[H");
+        printf(" MEPA Poll Link Information per Port \r\n");
+        for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
+            if (port_no != 2) {
+                continue;
+            }
+            if (mepa_poll(inst->phy[port_no], &status) == 0) {
+                printf("Port: %d, Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", port_no, portspeed2txt[status.speed], \
+                status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
+            } else {
+                printf("Port %d poll failed.\r\n", port_no);
+            }
+        }
+        // fflush(stdout); 
+        sleep(1);
+        break;
+    }
+
+    // Debug: Enable loopback on port 2 (P1)
+    printf("\r\n MEPA Loopback Configuration\r\n");
+    port_no = 2;
+    if (aux_malibu_lb_conf(inst->phy[port_no], port_no) == 0) {
+        printf("Port %d loopback enabled.\r\n", port_no);
+    } else {
+        printf("Port %d loopback enable failed.\r\n", port_no);
+    }
     return ret;
 }
 

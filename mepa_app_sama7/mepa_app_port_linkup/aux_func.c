@@ -115,7 +115,7 @@ static const appl_malibu_gpio_port_map_t malibu_gpio_map[] = {
      },
 };
 
-mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
+mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 {
     PRINT_FUN();
     vtss_rc rc = VTSS_RC_OK;
@@ -323,4 +323,130 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
     /* ********************************************************** */
 
     return rc;
+}
+
+mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no) 
+{
+    // vtss loopback from old phy_demo_appl vtss_appl_10g_phy_malibu.c
+    // search for "strcmp(command, "lpback")"
+
+    vtss_phy_10g_loopback_t    lpback;
+    vtss_lb_type_t             lpback_type = VTSS_LB_NONE;
+    char                       lpback_descr[6];
+    char value_str[255] = {0};
+    memset (&lpback_descr[0], 0, sizeof(lpback_descr));
+
+    vtss_phy_10g_loopback_set(NULL, port_no, &lpback);
+
+    switch (lpback.lb_type) {
+    case VTSS_LB_NONE: lpback_descr[0] = 'N'; lpback_descr[1] = 'O'; lpback_descr[2] = 'N'; lpback_descr[3] = 'E'; break;
+    case VTSS_LB_H2: lpback_descr[0] = 'H'; lpback_descr[1] = '2'; break;
+    case VTSS_LB_H3: lpback_descr[0] = 'H'; lpback_descr[1] = '3'; break;
+    case VTSS_LB_H4: lpback_descr[0] = 'H'; lpback_descr[1] = '4'; break;
+    case VTSS_LB_H5: lpback_descr[0] = 'H'; lpback_descr[1] = '5'; break;
+    case VTSS_LB_H6: lpback_descr[0] = 'H'; lpback_descr[1] = '6'; break;
+    case VTSS_LB_L0: lpback_descr[0] = 'L'; lpback_descr[1] = '0'; break;
+    case VTSS_LB_L1: lpback_descr[0] = 'L'; lpback_descr[1] = '1'; break;
+    case VTSS_LB_L2: lpback_descr[0] = 'L'; lpback_descr[1] = '2'; break;
+    case VTSS_LB_L3: lpback_descr[0] = 'L'; lpback_descr[1] = '3'; break;
+    case VTSS_LB_L2C: lpback_descr[0] = 'L'; lpback_descr[1] = '2'; lpback_descr[2] = 'C'; break;
+    default:
+        printf ("Current Loopback Description INVALID,  Port_no: %d \n",  port_no);
+        memset (&lpback_descr[0], 0, sizeof(lpback_descr));
+    }
+    printf ("Current Loopback is: %s  Type: %s \n\n",  (lpback.enable ? "Enabled" : "Disabled"), lpback_descr);
+
+    printf ("Loopback Options for Port: %d \n", port_no);
+    printf ("  H2: Host Loopback 2, 40-bit XAUI-PHY interface Mirror XAUI data\n");
+    printf ("  H3: Host Loopback 3, 64-bit PCS after the gearbox FF00 repeating IEEE PCS system loopback \n");
+    printf ("  H4: Host Loopback 4, 64-bit WIS FF00 repeating IEEE WIS system loopback \n");
+    printf ("  H5: Host Loopback 5, 1-bit SFP+ after SerDes Mirror XAUI data IEEE PMA system loopback \n");
+    printf ("  H6: Host Loopback 6, 32-bit XAUI-PHY interface Mirror XAUI data  \n\n");
+    printf ("  L0: Line Loopback 0, 4-bit XAUI before SerDes Mirror SFP+ data \n");
+    printf ("  L1: Line Loopback 1, 4-bit XAUI after SerDes Mirror SFP+ data IEEE PHY-XS network loopback \n");
+    printf ("  L2: Line Loopback 2, 64-bit XGMII after FIFO Mirror SFP+ data  \n");
+    printf ("  L3: Line Loopback 3, 64-bit PMA interface Mirror SFP+ data \n");
+    printf ("  L2C: Line Line loopback 4 after cross connect    \n\n");
+    printf ("Enter Loopback Type: H2/H3/H4/H5/H6/L0/L1/L2/L3/L2C \n");
+    memset (&value_str[0], 0, sizeof(value_str));
+    scanf("%s", &value_str[0]);
+
+    if (value_str [0] == 'h' || value_str [0] == 'H' ) {
+        switch (value_str [1]) {
+        case '2':
+            lpback_type = VTSS_LB_H2;
+            break;
+        case '3':
+            lpback_type = VTSS_LB_H3;
+            break;
+        case '4':
+            lpback_type = VTSS_LB_H4;
+            break;
+        case '5':
+            lpback_type = VTSS_LB_H5;
+            break;
+        case '6':
+            lpback_type = VTSS_LB_H6;
+            break;
+        default:
+            break;
+        }
+    } else if (value_str [0] == 'l' || value_str [0] == 'L' ) {
+        switch (value_str [1]) {
+        case '0':
+            lpback_type = VTSS_LB_L0;
+            break;
+        case '1':
+            lpback_type = VTSS_LB_L1;
+            break;
+        case '2':
+            if (value_str [2] == 'c' || value_str [2] == 'C') {
+                lpback_type = VTSS_LB_L2C;
+            } else {
+                lpback_type = VTSS_LB_L2;
+            }
+            break;
+        case '3':
+            lpback_type = VTSS_LB_L3;
+            break;
+        default:
+            break;
+        }
+
+    } else {
+        lpback_type = VTSS_LB_NONE;
+    }
+
+    lpback.lb_type = lpback_type;
+    switch (lpback.lb_type) {
+    case VTSS_LB_NONE: lpback_descr[0] = 'N'; lpback_descr[1] = 'O'; lpback_descr[2] = 'N'; lpback_descr[3] = 'E'; break;
+    case VTSS_LB_H2: lpback_descr[0] = 'H'; lpback_descr[1] = '2'; break;
+    case VTSS_LB_H3: lpback_descr[0] = 'H'; lpback_descr[1] = '3'; break;
+    case VTSS_LB_H4: lpback_descr[0] = 'H'; lpback_descr[1] = '4'; break;
+    case VTSS_LB_H5: lpback_descr[0] = 'H'; lpback_descr[1] = '5'; break;
+    case VTSS_LB_H6: lpback_descr[0] = 'H'; lpback_descr[1] = '6'; break;
+    case VTSS_LB_L0: lpback_descr[0] = 'L'; lpback_descr[1] = '0'; break;
+    case VTSS_LB_L1: lpback_descr[0] = 'L'; lpback_descr[1] = '1'; break;
+    case VTSS_LB_L2: lpback_descr[0] = 'L'; lpback_descr[1] = '2'; break;
+    case VTSS_LB_L3: lpback_descr[0] = 'L'; lpback_descr[1] = '3'; break;
+    case VTSS_LB_L2C: lpback_descr[0] = 'L'; lpback_descr[1] = '2'; lpback_descr[2] = 'C'; break;
+    default:
+        printf ("Current Loopback Description INVALID,  Port_no: %d \n",  port_no);
+        memset (&lpback_descr[0], 0, sizeof(lpback_descr));
+    }
+    printf ("Selected Loopback Type: %s \n",  lpback_descr);
+    printf ("E=Enable or D=Disable Loopback? \n");
+    memset (&value_str[0], 0, sizeof(value_str));
+    scanf("%s", &value_str[0]);
+
+    if (value_str [0] == 'e' || value_str [0] == 'E') {
+        lpback.enable = 1;
+    } else {
+        lpback.enable = 0;
+    }
+
+    printf ("Port %d, Setting Loopback Type: %s  to  %s  \n",  port_no, lpback_descr, (lpback.enable ? "Enabled" : "Disabled"));
+    vtss_phy_10g_loopback_set(NULL, port_no, &lpback);
+            
+    return MESA_RC_OK;
 }
