@@ -2,6 +2,14 @@
 
 DUT_IP=192.168.137.221
 
+if [ "$1" = "help" ];
+    then
+        echo "Usage: $0 [clear-keys|show-pub|debug]"
+        echo "  clear-keys: Clear SSH keys for the DUT IP from known_hosts"
+        echo "  show-pub: Show public SSH keys in ~/.ssh/*.pub for copying to target's authorized_keys"
+        echo "  debug: Start a debug session by killing existing gdbserver and starting a new one on the DUT"
+        exit 1
+fi
 #clear keys
 if [ "$1" = "clear-keys" ];
     then

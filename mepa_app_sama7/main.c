@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
         }
         else if (strcmp(argv[1], "-t") == 0) {
-            printf(" test_mode = 0\r\n");
+            printf(" test_mode = 1\r\n");
             test_mode = 1;
         }
     }
