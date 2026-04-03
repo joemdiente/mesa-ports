@@ -29,6 +29,10 @@
 #include "main.h"
 #include <stdio.h>
 
+#define MY_DEBUG
+#define MY_DEBUG_SHOW_ADVANCED
+#include "my_debug.h"
+
 /*
  * Below codes are taken from https://github.com/MicrochipTech/mepa-app-malibu10-rpi
  */
@@ -140,12 +144,12 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     if(rc != VTSS_RC_OK)
     {
-        printf("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: INPUT (SFP_MOD_DET)\n", port_no, gmap->gpio_sfp_mod_det);
+        PRINT_RES("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: INPUT (SFP_MOD_DET)\n", port_no, gmap->gpio_sfp_mod_det);
         return rc;
     }
     else
     {
-        printf("Malibu GPIO Input: SFP_MOD_DET configuration for port %d, gpio %d \n", port_no, gmap->gpio_sfp_mod_det);
+        PRINT_RES("Malibu GPIO Input: SFP_MOD_DET configuration for port %d, gpio %d \n", port_no, gmap->gpio_sfp_mod_det);
     }
 
     // RX_LOS
@@ -159,12 +163,12 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     if(rc != VTSS_RC_OK)
     {
-        printf("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: INPUT (RX_LOS)\n", port_no, gmap->gpio_rx_los);
+        PRINT_RES("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: INPUT (RX_LOS)\n", port_no, gmap->gpio_rx_los);
         return rc;
     }
     else
     {
-        printf("Malibu GPIO Input: RX_LOS configuration for port %d, gpio %d \n", port_no, gmap->gpio_rx_los);
+        PRINT_RES("Malibu GPIO Input: RX_LOS configuration for port %d, gpio %d \n", port_no, gmap->gpio_rx_los);
     }
 
     // TX_FAULT
@@ -178,12 +182,12 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     if(rc != VTSS_RC_OK)
     {
-        printf("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: INPUT (TX_FAULT)\n", port_no, gmap->gpio_tx_fault);
+        PRINT_RES("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: INPUT (TX_FAULT)\n", port_no, gmap->gpio_tx_fault);
         return rc;
     }
     else
     {
-        printf("Malibu GPIO Input: TX_FAULT configuration for port %d, gpio %d \n", port_no, gmap->gpio_tx_fault);
+        PRINT_RES("Malibu GPIO Input: TX_FAULT configuration for port %d, gpio %d \n", port_no, gmap->gpio_tx_fault);
     }
 
     /* ********************************************************** */
@@ -200,12 +204,12 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     if(rc != VTSS_RC_OK)
     {
-        printf("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: DRIVE_LOW (TX_DISABLE)\n", port_no, gmap->gpio_tx_dis);
+        PRINT_RES("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: DRIVE_LOW (TX_DISABLE)\n", port_no, gmap->gpio_tx_dis);
         return rc;
     }
     else
     {
-        printf("Malibu GPIO Output: Driving LOW configuration for port %d, gpio %d (TX_DISABLE)\n", port_no, gmap->gpio_tx_dis);
+        PRINT_RES("Malibu GPIO Output: Driving LOW configuration for port %d, gpio %d (TX_DISABLE)\n", port_no, gmap->gpio_tx_dis);
     }
 
     /* ********************************************************** */
@@ -215,7 +219,7 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
     rc = vtss_phy_10g_gpio_mode_get(NULL, port_no, gmap->gpio_i2c_dat, &gpio_conf);
     if(rc == VTSS_RC_OK)
     {
-        printf("Malibu port %d I2C DAT pin %d\n", port_no, gmap->gpio_i2c_dat);
+        PRINT_RES("Malibu port %d I2C DAT pin %d\n", port_no, gmap->gpio_i2c_dat);
         gpio_conf.mode = VTSS_10G_PHY_GPIO_OUT;
         gpio_conf.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_DATA_OUT;
         gpio_conf.p_gpio = 0;   // Route the internal signal "SDA Output" to GPIO0_OUT
@@ -224,19 +228,19 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     if(rc != VTSS_RC_OK)
     {
-        printf("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: OUTPUT (I2C SDA)\n", port_no, gmap->gpio_i2c_dat);
+        PRINT_RES("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: OUTPUT (I2C SDA)\n", port_no, gmap->gpio_i2c_dat);
         return rc;
     }
     else
     {
-        printf("Malibu GPIO Output: I2C Master DATA configuration for port %d, gpio %d\n", port_no, gmap->gpio_i2c_dat);
+        PRINT_RES("Malibu GPIO Output: I2C Master DATA configuration for port %d, gpio %d\n", port_no, gmap->gpio_i2c_dat);
     }
 
     // SCL
     rc = vtss_phy_10g_gpio_mode_get(NULL, port_no, gmap->gpio_i2c_clk, &gpio_conf);
     if(rc == VTSS_RC_OK)
     {
-        printf("Malibu port %d I2C CLK pin %d\n", port_no, gmap->gpio_i2c_clk);
+        PRINT_RES("Malibu port %d I2C CLK pin %d\n", port_no, gmap->gpio_i2c_clk);
         gpio_conf.mode = VTSS_10G_PHY_GPIO_OUT;
         gpio_conf.in_sig = VTSS_10G_GPIO_INTR_SGNL_I2C_MSTR_CLK_OUT;
         gpio_conf.p_gpio = 1;   // Route the internal signal "SCL Output" to GPIO1_OUT
@@ -245,12 +249,12 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     if(rc != VTSS_RC_OK)
     {
-        printf("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: OUTPUT (I2C SCL)\n", port_no, gmap->gpio_i2c_clk);
+        PRINT_RES("vtss_phy_10g_gpio_mode_set, port %d, gpio %d, mode: OUTPUT (I2C SCL)\n", port_no, gmap->gpio_i2c_clk);
         return rc;
     }
     else
     {
-        printf("Malibu GPIO Output: I2C Master CLK configuration for port %d, gpio %d\n", port_no, gmap->gpio_i2c_clk);
+        PRINT_RES("Malibu GPIO Output: I2C Master CLK configuration for port %d, gpio %d\n", port_no, gmap->gpio_i2c_clk);
     }
 
     /* ********************************************************** */
@@ -270,50 +274,50 @@ mepa_rc appl_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
     u8 data;
 
     // Skip I2C access for ports 0 and 1 (which don't connect to SFP+ ports on VSC8258EV)
-    // if(port_no < 2)
-    // {
-    //     return rc;
-    // }
+    if(port_no < 2)
+    {
+        return rc;
+    }
 
     for (address = 0; address < 16; address++)
     {
         if(mepa_i2c_read(inst->phy[port_no], 0, address, 0, 0, 0, &data) != MEPA_RC_OK)
         {
-	        printf("mepa_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gmap->gpio_i2c_clk, address);
-	        printf("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
+	        PRINT_RES("mepa_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gmap->gpio_i2c_clk, address);
+	        PRINT_RES("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
         } 
         else
         {
-	        printf("Malibu reading I2C register @ addr = %d: value = 0x%X \n", address, data);
+	        PRINT_RES("Malibu reading I2C register @ addr = %d: value = 0x%X \n", address, data);
         }
     }
 
     address = 0x3E;
     if (mepa_i2c_read(inst->phy[port_no], 0, address, 0, 0, 0, &data) != MEPA_RC_OK)
     {
-        printf("mepa_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gmap->gpio_i2c_clk, address);
-        printf("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
+        PRINT_RES("mepa_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gmap->gpio_i2c_clk, address);
+        PRINT_RES("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
     } 
     else
     {
-        printf("Malibu reading I2C register @ addr = 0x%X: value = 0x%X \n", address, data);
+        PRINT_RES("Malibu reading I2C register @ addr = 0x%X: value = 0x%X \n", address, data);
     }
 
     data = 0xAB;
     if (mepa_i2c_write(inst->phy[port_no], 0, address, 0, 0, 0, &data) != MEPA_RC_OK)
     {
-        printf("mepa_i2c_write, port %d, gpio %d, address = 0x%X, data = 0x%X\n", port_no, gmap->gpio_i2c_clk, address, data);
-        printf("Malibu Error writing I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
+        PRINT_RES("mepa_i2c_write, port %d, gpio %d, address = 0x%X, data = 0x%X\n", port_no, gmap->gpio_i2c_clk, address, data);
+        PRINT_RES("Malibu Error writing I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
     }
 
     if (mepa_i2c_read(inst->phy[port_no], 0, address, 0, 0, 0, &data) != MEPA_RC_OK)
     {
-        printf("mepa_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gmap->gpio_i2c_clk, address);
-        printf("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
+        PRINT_RES("mepa_i2c_read, port %d, gpio %d, address = 0x%X\n", port_no, gmap->gpio_i2c_clk, address);
+        PRINT_RES("Malibu Error reading I2C register on SFP+ module for port %d, gpio %d \n", port_no, gmap->gpio_i2c_clk);
     }
     else
     {
-        printf("Malibu reading I2C register @ addr = 0x%X: value = 0x%X \n", address, data);
+        PRINT_RES("Malibu reading I2C register @ addr = 0x%X: value = 0x%X \n", address, data);
     }
 
     /* ********************************************************** */

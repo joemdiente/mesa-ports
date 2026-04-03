@@ -21,17 +21,17 @@
                         int i = 0; for (i = y; i <= z; i++) \
                         printf("buffer[%d]: 0x%X\n", i, buf[i]);} }
 #ifdef MY_DEBUG_SHOW_ADVANCED
-#define PRINT_RES(y,z) 	{ printf("[DEBUG: %s] %s: 0x%X\r\n", __FUNCTION__, y, z); }
+#define PRINT_RES(y, ...) 	{ printf("[DEBUG: %s] %s: 0x%X\r\n", __FUNCTION__, y, ##__VA_ARGS__); }
 #define PRINT_FUN() { printf("[DEBUG: Entered %s] \r\n", __FUNCTION__); }
 #else //Show function
 #define PRINT_FUN() {}
-#define PRINT_RES(y,z) {}
+#define PRINT_RES(y, ...) {}
 #endif //Show Function
 
 #else // debug
 #define PRINT_BUF_RANGE(x,y,z) {}
 #define PRINT_FUN() {}
-#define PRINT_RES(y,z) {}
+#define PRINT_RES(y, ...) {}
 #endif // debug 
 
 /* End of User Configuration */
