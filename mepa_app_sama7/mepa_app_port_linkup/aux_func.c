@@ -324,7 +324,12 @@ mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 
     return rc;
 }
-
+mepa_rc aux_malibu_debug_info_print(appl_inst_t* inst, mepa_port_no_t port_no)
+{
+    // Not working.
+    vtss_phy_10g_debug_malibu_info_print(NULL, printf, port_no);
+    return MEPA_RC_OK;
+}
 mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no) 
 {
     // vtss loopback from old phy_demo_appl vtss_appl_10g_phy_malibu.c

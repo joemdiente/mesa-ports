@@ -39,6 +39,8 @@
 // Use code from aux-func.c to keep this file clean.
 extern __attribute__((weak)) mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
 extern __attribute__((weak)) mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
+extern __attribute__((weak)) mepa_rc aux_malibu_debug_info_print(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
+    
 /*
  * This is the main function for the MEPA application sample.
  */
@@ -160,24 +162,13 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         "Auto",
     };
 
-    while(1) {
-        // printf("\033[2J\033[H");
-        printf(" MEPA Poll Link Information per Port \r\n");
-        for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
-            if (port_no != 2) {
-                continue;
-            }
-            if (mepa_poll(inst->phy[port_no], &status) == 0) {
-                printf("Port: %d, Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", port_no, portspeed2txt[status.speed], \
-                status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
-            } else {
-                printf("Port %d poll failed.\r\n", port_no);
-            }
-        }
-        // fflush(stdout); 
-        sleep(1);
-        break;
-    }
+    typedef struct{
+        bool mod_detect;
+        bool tx_fault;
+        bool rx_los;
+        bool tx_dis;
+    } sfp_stat_t;
+    sfp_stat_t sfp_val = {};
 
     // Debug: Enable loopback on port 2 (P1)
     printf("\r\n MEPA Loopback Configuration\r\n");
@@ -187,6 +178,36 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     } else {
         printf("Port %d loopback enable failed.\r\n", port_no);
     }
+    while(1) {
+        // printf("\033[2J\033[H");
+        printf(" MEPA Poll Link Information per Port \r\n");
+        for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
+            if (port_no != 2) {
+                continue;
+            }
+            if (mepa_poll(inst->phy[port_no], &status) == 0) {
+                // For SFP: Use TX/RX signal detect for link status.
+                mepa_gpio_in_get(inst->phy[port_no], 22, &sfp_val.rx_los); // GPIO 22 for RXLOS
+                mepa_gpio_in_get(inst->phy[port_no], 21, &sfp_val.tx_fault); // GPIO 5 for TXFAULT
+                mepa_gpio_in_get(inst->phy[port_no], 17, &sfp_val.mod_detect); // GPIO 1 for MOD_DETECT
+                mepa_gpio_in_get(inst->phy[port_no], 20, &sfp_val.tx_dis); // GPIO 12 for TX_DIS
+                printf("Port: %d, SFP Mod Det: %s, TX Fault: %s, RX LOS: %s, ", \
+                    port_no, sfp_val.mod_detect? "Yes":"No", \
+                    sfp_val.tx_fault? "Yes":"No", sfp_val.rx_los? "Yes":"No", \
+                    sfp_val.tx_dis? "Yes":"No"
+                    );
+                printf("\r\nPort: %d, Speed: %s, fdx: %s, Cu: %s, Fi: %s, Link: %s\n", port_no, portspeed2txt[status.speed], \
+                status.fdx? "Yes":"No", status.copper? "Yes":"No", status.fiber? "Yes":"No", status.link? "Up" : "Down");
+            } else {
+                printf("Port %d poll failed.\r\n", port_no);
+            }
+        }
+        // fflush(stdout); 
+        sleep(1);
+        // break;
+    }
+
+
     return ret;
 }
 
