@@ -8,5 +8,6 @@
         "vtss_appl_10g_phy_malibu.h": "c",
         "vtss_appl.h": "c"
     },
-    "cmake.sourceDirectory": "D:/Desktop/mesa-ports/mcp2210-hidapi"
+    "cmake.sourceDirectory": "D:/Desktop/mesa-ports/mcp2210-hidapi",
+    "cmake.ignoreCMakeListsMissing": true
 }

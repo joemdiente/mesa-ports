@@ -159,7 +159,7 @@ mepa_callout_t appl_mcp2210_hidapi_spi =
 
     // Test SPI
     uint32_t val = 0;
-    mcp2210_hidapi_spi_32bit_read(NULL, 0x0, 0x1e, 0x0000, &val);
+    mcp2210_hidapi_spi_32bit_read(appl_callout_ctx, 0x0, 0x1e, 0x0000, &val);
     printf("In Line %d: Dev ID = 0x%x\r\n\r\n", __LINE__, val);
 
     // Real applications MUST check the return value

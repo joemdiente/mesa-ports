@@ -230,7 +230,7 @@ int malibu_mcp2210_board_init(int argc, char **argv)
 #endif
 
   // Read
-  mcp2210_hidapi_spi_32bit_read_write(NULL, 0x0, 1, 0x1e, 0x0000, val);
+  mcp2210_hidapi_spi_32bit_read_write(hidapi_handle, 0x0, 1, 0x1e, 0x0000, val);
   printf("DEV_ID: 0x%08x\n",*val); fflush(stdout);
   printf("Out VSC8258EV with MCP2210 Evaluation Board\n"); fflush(stdout);
   return 0;

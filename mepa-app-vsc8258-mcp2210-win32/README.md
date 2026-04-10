@@ -1,9 +1,12 @@
+![Microchip Technology Inc.](docs/microchip_logo.png)
 # VSC8258EV for Win32 (MEPA) using MCP2210-HIDAPI Library
 
 This code uses a library called MCP2210-HIDAPI to be able to run 
 MEPA for Malibu PHY on Windows x86/x64.
 
 ## Hardware Setup
+
+### Setup 1
 * MCP2210 Breakout Module - [ADM00419](https://www.microchip.com/en-us/development-tool/adm00419)
 
 * VSC8258EV Evaluation Board - [VSC8258EV](https://www.microchip.com/en-us/development-tool/vsc8258ev)
@@ -20,7 +23,7 @@ MEPA for Malibu PHY on Windows x86/x64.
 ## Software Setup
 ### Pre-requisites 
 * __MCP2210-HIDAPI__ Library 
-    * [Branch: `main`](https://github.com/joemdiente/mcp2210-hidapi)
+    * [Branch: `main`](https://github.com/joem-mchp/mcp2210-hidapi)
     * Install [MSYS2](https://www.msys2.org/):
         * Run __MSYS2 UCRT64__ and __install__ the following:
             ```
@@ -36,7 +39,7 @@ MEPA for Malibu PHY on Windows x86/x64.
     git submodule init
     git submodule update
     ```
-2. Open bash, create build directory and make sure to run CMake with "MinGW Makefiles". See [CMake Generate Logs](docs/cmake%20generate%20logs.txt).
+2. Open bash, create build directory and make sure to run CMake with "MinGW Makefiles". See [CMake Generate Logs](docs/cmake-generate%20logs.txt).
     ```
     bash
     mkdir build
@@ -47,6 +50,13 @@ MEPA for Malibu PHY on Windows x86/x64.
     ```
     mingw32-make.exe
     ```
-
+4. Running sample application. See [app-runtime logs.txt](docs/app-runtime%20logs.txt)
+   ```
+   Run build\mepa_app_malibu_mcp2210-win32.exe
+   ```
 ### Run Instructions 
-Make sure that __hidapi.dll__ is alongside __mepa_app_malibu_mcp2210-win32.exe__.
+Make sure that __hidapi.dll__ is alongside __mepa_app_malibu_mcp2210-win32.exe__. \
+They can be copied anywhere. 
+
+## Testing Instructions
+Please see [Running MEPA on Windows - VSC8258](to_do)

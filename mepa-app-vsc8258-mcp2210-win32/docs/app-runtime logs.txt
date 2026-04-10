@@ -27,11 +27,9 @@ Manufacturer String: Microchip Technology Inc.
 Product String: MCP2210 USB-to-SPI Master
 Serial Number String: (48) 0000152519
 Indexed String 1: Microchip Technology Inc.
-mcp2210_hidapi_spi_32bit_read_write: Invalid context or value pointer
-DEV_ID: 0x0c21c7e0
+DEV_ID: 0x00008258
 Out VSC8258EV with MCP2210 Evaluation Board
-mcp2210_hidapi_spi_32bit_read_write: Invalid context or value pointer
-In Line 163: Dev ID = 0x0
+In Line 163: Dev ID = 0x8258
 
 
 
