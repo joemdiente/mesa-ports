@@ -330,7 +330,7 @@ mepa_rc aux_malibu_debug_info_print(appl_inst_t* inst, mepa_port_no_t port_no)
     vtss_debug_printf_t pr = (vtss_debug_printf_t) printf;
     printf("\n==========================================================\n");
     printf("Debug Reg Dump for Port %d\n", port_no);
-    if (vtss_phy_10g_debug_register_dump(inst, pr, FALSE, port_no) != VTSS_RC_OK) {
+    if (vtss_phy_10g_debug_register_dump(NULL, pr, FALSE, port_no) != VTSS_RC_OK) {
         printf("vtss_phy_malibu_register_dump, port %d\n", port_no);
     }
     printf("==========================================================\n");
@@ -447,6 +447,12 @@ mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no, bool conf_
     default:
         printf ("Current Loopback Description INVALID,  Port_no: %d \n",  port_no);
         memset (&lpback_descr[0], 0, sizeof(lpback_descr));
+    }
+    if(lpback.lb_type == VTSS_LB_NONE) {
+        printf("No loopback selected. Will not enable loopback\r\n");
+        lpback.enable = 0;
+        vtss_phy_10g_loopback_set(NULL, port_no, &lpback);
+        return MESA_RC_OK;
     }
     printf ("Selected Loopback Type: %s \n",  lpback_descr);
     printf ("E=Enable or D=Disable Loopback? \n");

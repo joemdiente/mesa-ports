@@ -87,8 +87,8 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         conf.speed = MESA_SPEED_1G;
         conf.conf_10g.oper_mode = MEPA_PHY_LAN_MODE;
         conf.conf_10g.interface_mode = MEPA_PHY_SFI_XFI;
-        conf.conf_10g.channel_id = MEPA_CHANNELID_NONE;
-        conf.conf_10g.xfi_pol_invert = 1;
+        conf.conf_10g.channel_id = port_no + 1;
+        conf.conf_10g.xfi_pol_invert = 1; 
         conf.conf_10g.polarity.host_rx = false;
         conf.conf_10g.polarity.line_rx = false;
         conf.conf_10g.polarity.host_tx = false;
@@ -97,8 +97,8 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         conf.conf_10g.lref_for_host = false;
         conf.conf_10g.h_clk_src_is_high_amp = true;
         conf.conf_10g.l_clk_src_is_high_amp = true;
-        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_SR;
-        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_SR;
+        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_SR2_SC;
+        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_SR2_SC;
         conf.conf_10g.channel_high_to_low = false;
 
         // 1G Control
@@ -178,19 +178,6 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     } else {
         printf("Port %d loopback enable failed.\r\n", port_no);
     }
-    printf("Sleep for a while to allow user to see loopback effect on link status before polling it.\r\n");
-    sleep(10); // Sleep long enough to allow user to see loopback effect on link status before
-
-    printf(" Debug Register Dump\r\n");
-    port_no = 2;   
-    // for (port_no = 2; port_no < 3; port_no++) {
-    printf("Port %d debug info:\r\n", port_no);
-    if (aux_malibu_debug_info_print(inst->phy[port_no], port_no) != 0) {
-        printf("Port %d debug info print failed.\r\n", port_no);
-    }
-    // }
-
-    // exit(EXIT_SUCCESS);
 
     while(1) {
         // printf("\033[2J\033[H");
@@ -218,16 +205,22 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         }
         // fflush(stdout); 
         sleep(1);
-        printf("Continue polling? (y/n) or l for check loopback. \n");
+        printf("Continue polling? n for exit; l for check loopback; d for reg dump; else continue\n");
         char choice[10] = {0};
         scanf("%s", &choice[0]);
+        port_no = 2;
         if (choice[0] == 'n' || choice[0] == 'N') {
             break;
         } else if (choice[0] == 'l' || choice[0] == 'L') {
-            if (aux_malibu_lb_conf(inst->phy[2], 2, false) == 0) {
+            if (aux_malibu_lb_conf(inst->phy[port_no], port_no, false) == 0) {
                 printf("Port %d loopback enabled.\r\n", port_no);
             } else {
                 printf("Port %d loopback enable failed.\r\n", port_no);
+            }
+        } else if (choice[0] == 'd' || choice[0] == "D") {
+            printf("Debug Register Dump\r\n");
+            if (aux_malibu_debug_info_print(inst->phy[port_no], port_no) != 0) {
+                printf("Port %d debug info print failed.\r\n", port_no);
             }
         } else {
             continue;
