@@ -28,6 +28,7 @@
 #include <vtss_phy_api.h>
 #include "main.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 #define MY_DEBUG
 #define MY_DEBUG_SHOW_ADVANCED
@@ -326,11 +327,16 @@ mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no)
 }
 mepa_rc aux_malibu_debug_info_print(appl_inst_t* inst, mepa_port_no_t port_no)
 {
-    // Not working.
-    vtss_phy_10g_debug_malibu_info_print(NULL, printf, port_no);
+    vtss_debug_printf_t pr = (vtss_debug_printf_t) printf;
+    printf("\n==========================================================\n");
+    printf("Debug Reg Dump for Port %d\n", port_no);
+    if (vtss_phy_10g_debug_register_dump(inst, pr, FALSE, port_no) != VTSS_RC_OK) {
+        printf("vtss_phy_malibu_register_dump, port %d\n", port_no);
+    }
+    printf("==========================================================\n");
     return MEPA_RC_OK;
 }
-mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no) 
+mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no, bool conf_enable) 
 {
     // vtss loopback from old phy_demo_appl vtss_appl_10g_phy_malibu.c
     // search for "strcmp(command, "lpback")"
@@ -341,7 +347,7 @@ mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no)
     char value_str[255] = {0};
     memset (&lpback_descr[0], 0, sizeof(lpback_descr));
 
-    vtss_phy_10g_loopback_set(NULL, port_no, &lpback);
+    vtss_phy_10g_loopback_get(NULL, port_no, &lpback);
 
     switch (lpback.lb_type) {
     case VTSS_LB_NONE: lpback_descr[0] = 'N'; lpback_descr[1] = 'O'; lpback_descr[2] = 'N'; lpback_descr[3] = 'E'; break;
@@ -361,6 +367,9 @@ mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no)
     }
     printf ("Current Loopback is: %s  Type: %s \n\n",  (lpback.enable ? "Enabled" : "Disabled"), lpback_descr);
 
+    if (conf_enable == false) {
+        return MEPA_RC_OK;
+    }
     printf ("Loopback Options for Port: %d \n", port_no);
     printf ("  H2: Host Loopback 2, 40-bit XAUI-PHY interface Mirror XAUI data\n");
     printf ("  H3: Host Loopback 3, 64-bit PCS after the gearbox FF00 repeating IEEE PCS system loopback \n");

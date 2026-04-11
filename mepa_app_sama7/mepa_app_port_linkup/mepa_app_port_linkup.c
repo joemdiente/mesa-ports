@@ -38,7 +38,7 @@
 
 // Use code from aux-func.c to keep this file clean.
 extern __attribute__((weak)) mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
-extern __attribute__((weak)) mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
+extern __attribute__((weak)) mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no, bool conf_enable); // Use "weak" so it is NULL in memory.
 extern __attribute__((weak)) mepa_rc aux_malibu_debug_info_print(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
     
 /*
@@ -97,8 +97,8 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         conf.conf_10g.lref_for_host = false;
         conf.conf_10g.h_clk_src_is_high_amp = true;
         conf.conf_10g.l_clk_src_is_high_amp = true;
-        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_SR2_SC;
-        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_SR2_SC;
+        conf.conf_10g.h_media = MEPA_MEDIA_TYPE_SR;
+        conf.conf_10g.l_media = MEPA_MEDIA_TYPE_SR;
         conf.conf_10g.channel_high_to_low = false;
 
         // 1G Control
@@ -173,11 +173,25 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     // Debug: Enable loopback on port 2 (P1)
     printf("\r\n MEPA Loopback Configuration\r\n");
     port_no = 2;
-    if (aux_malibu_lb_conf(inst->phy[port_no], port_no) == 0) {
+    if (aux_malibu_lb_conf(inst->phy[port_no], port_no, true) == 0) {
         printf("Port %d loopback enabled.\r\n", port_no);
     } else {
         printf("Port %d loopback enable failed.\r\n", port_no);
     }
+    printf("Sleep for a while to allow user to see loopback effect on link status before polling it.\r\n");
+    sleep(10); // Sleep long enough to allow user to see loopback effect on link status before
+
+    printf(" Debug Register Dump\r\n");
+    port_no = 2;   
+    // for (port_no = 2; port_no < 3; port_no++) {
+    printf("Port %d debug info:\r\n", port_no);
+    if (aux_malibu_debug_info_print(inst->phy[port_no], port_no) != 0) {
+        printf("Port %d debug info print failed.\r\n", port_no);
+    }
+    // }
+
+    // exit(EXIT_SUCCESS);
+
     while(1) {
         // printf("\033[2J\033[H");
         printf(" MEPA Poll Link Information per Port \r\n");
@@ -204,6 +218,21 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         }
         // fflush(stdout); 
         sleep(1);
+        printf("Continue polling? (y/n) or l for check loopback. \n");
+        char choice[10] = {0};
+        scanf("%s", &choice[0]);
+        if (choice[0] == 'n' || choice[0] == 'N') {
+            break;
+        } else if (choice[0] == 'l' || choice[0] == 'L') {
+            if (aux_malibu_lb_conf(inst->phy[2], 2, false) == 0) {
+                printf("Port %d loopback enabled.\r\n", port_no);
+            } else {
+                printf("Port %d loopback enable failed.\r\n", port_no);
+            }
+        } else {
+            continue;
+        }
+            
         // break;
     }
 
