@@ -40,6 +40,7 @@
 extern __attribute__((weak)) mepa_rc aux_malibu_gpio_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
 extern __attribute__((weak)) mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no, bool conf_enable); // Use "weak" so it is NULL in memory.
 extern __attribute__((weak)) mepa_rc aux_malibu_debug_info_print(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
+extern __attribute__((weak)) mepa_rc aux_malibu_lane_sync_conf(appl_inst_t* inst, mepa_port_no_t port_no); // Use "weak" so it is NULL in memory.
     
 /*
  * This is the main function for the MEPA application sample.
@@ -52,9 +53,12 @@ int mepa_app_sample_appl(appl_inst_t *inst)
 
     // 1. Simple - Reset PHY
     printf("\r\n MEPA Reset all PHYs\r\n");
+    int i = 0;
     mepa_reset_param_t rst_conf = {};
+
     rst_conf.reset_point = MEPA_RESET_POINT_PRE;
-    
+    rst_conf.media_intf = MESA_PHY_MEDIA_IF_SFP_PASSTHRU;
+
     for (port_no = 0; port_no < MALIBU_EVB_PORT_COUNT; port_no++) {
         // Reset PHY ports
         ret = mepa_reset(inst->phy[port_no], &rst_conf);
@@ -66,6 +70,7 @@ int mepa_app_sample_appl(appl_inst_t *inst)
             printf("PHY Reset Success, port_no: %d\r\n", port_no);
         }
     }
+    
 
     // 2. Register Read/Write from MEPA
     printf("\r\n MEPA Register Read Only\r\n");
@@ -105,6 +110,14 @@ int mepa_app_sample_appl(appl_inst_t *inst)
         conf.mac_if_aneg_ena = false; // Disable MAC Aneg.
         conf.adv_dis = true; // Disable PHY Aneg Advertisement to force speed.
         conf.admin.enable = true;
+        conf.flow_control = false;
+
+        // 10G Lane Sync
+        if(aux_malibu_lane_sync_conf(inst->phy[port_no], port_no) != MEPA_RC_OK) {
+            printf("Port %d 10G lane sync configuration failed.\r\n", port_no);
+        } else {
+            printf("Port %d 10G lane sync configuration success.\r\n", port_no);
+        }
 
         if (mepa_conf_set(inst->phy[port_no], &conf) == 0) {
             printf("Port %d configuration success.\r\n", port_no);
@@ -174,9 +187,9 @@ int mepa_app_sample_appl(appl_inst_t *inst)
     printf("\r\n MEPA Loopback Configuration\r\n");
     port_no = 2;
     if (aux_malibu_lb_conf(inst->phy[port_no], port_no, true) == 0) {
-        printf("Port %d loopback enabled.\r\n", port_no);
+        printf("Port %d loopback\r\n", port_no);
     } else {
-        printf("Port %d loopback enable failed.\r\n", port_no);
+        printf("Port %d loopback failed.\r\n", port_no);
     }
 
     while(1) {
@@ -213,9 +226,9 @@ int mepa_app_sample_appl(appl_inst_t *inst)
             break;
         } else if (choice[0] == 'l' || choice[0] == 'L') {
             if (aux_malibu_lb_conf(inst->phy[port_no], port_no, false) == 0) {
-                printf("Port %d loopback enabled.\r\n", port_no);
+                printf("Port %d loopback \r\n", port_no);
             } else {
-                printf("Port %d loopback enable failed.\r\n", port_no);
+                printf("Port %d loopback failed.\r\n", port_no);
             }
         } else if (choice[0] == 'd' || choice[0] == "D") {
             printf("Debug Register Dump\r\n");

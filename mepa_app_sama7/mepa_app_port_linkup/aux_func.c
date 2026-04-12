@@ -470,3 +470,23 @@ mepa_rc aux_malibu_lb_conf(appl_inst_t* inst, mepa_port_no_t port_no, bool conf_
             
     return MESA_RC_OK;
 }
+
+mepa_rc aux_malibu_lane_sync_conf(appl_inst_t* inst, mepa_port_no_t port_no) 
+{
+    // Reference: vtss.c > vtss_phy_10g_lane_sync_set()
+    // Note: lane sync is enabled by default in Malibu PHYs, so this function is just for demonstration purposes
+
+    vtss_phy_10g_lane_sync_conf_t lane_sync = {0};
+    lane_sync.enable = true;
+    lane_sync.rx_macro = VTSS_PHY_10G_RX_MACRO_LINE;
+    lane_sync.tx_macro = VTSS_PHY_10G_TX_MACRO_LINE;
+    lane_sync.rx_ch = port_no;
+    lane_sync.tx_ch = port_no;  
+    
+    if (vtss_phy_10g_lane_sync_set(NULL, port_no, &lane_sync) != VTSS_RC_OK) {
+        printf("vtss_phy_10g_lane_sync_set, port %d failed\n", port_no);
+        return MEPA_RC_ERROR;
+    }
+
+    return MEPA_RC_OK;
+}
